@@ -1,7 +1,7 @@
 services:
   - type: web
     name: pricepulse-backend
-    runtime: docker
+    env: docker
     dockerfilePath: ./harvester/Dockerfile
     plan: free
     region: singapore
@@ -10,17 +10,6 @@ services:
         fromDatabase:
           name: pricepulse-db
           property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: pricepulse-redis
-          property: connectionString
-
-  - type: redis
-    name: pricepulse-redis
-    plan: free
-    region: singapore
-    ipAllowList: []
 
 databases:
   - name: pricepulse-db
