@@ -1,7 +1,7 @@
 services:
   - type: web
     name: pricepulse-backend
-    env: docker
+    runtime: docker
     dockerfilePath: ./harvester/Dockerfile
     plan: free
     region: singapore
@@ -20,9 +20,7 @@ services:
     name: pricepulse-redis
     plan: free
     region: singapore
-    ipAllowList:
-      - source: 0.0.0.0/0
-        description: internal access
+    ipAllowList: []
 
 databases:
   - name: pricepulse-db
