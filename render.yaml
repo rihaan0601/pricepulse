@@ -3,8 +3,6 @@ services:
     name: pricepulse-backend
     env: docker
     dockerfilePath: ./harvester/Dockerfile
-    plan: free
-    region: singapore
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -13,7 +11,4 @@ services:
 
 databases:
   - name: pricepulse-db
-    plan: free
-    region: singapore
     databaseName: pricepulse_db
-    databaseUser: pricepulse_user
