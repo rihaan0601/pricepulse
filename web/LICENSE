@@ -1,0 +1,50 @@
+===============================================================================
+OFFICIAL INTELLECTUAL PROPERTY & COPYRIGHT LICENSE AGREEMENT
+===============================================================================
+
+Copyright (c) 2026 PricePulse Technologies & Engine. All Rights Reserved.
+
+PROPRIETARY AND CONFIDENTIAL
+
+This repository, web application, backend API, system architecture, database schema,
+hyperlocal connector framework, split-basket optimization algorithm, dynamic brand 
+catalog generator, and associated documentation (collectively, the "Software") 
+are the exclusive intellectual property of PricePulse Technologies ("Owner").
+
+1. OWNERSHIP & COPYRIGHT CLAIM
+------------------------------
+All rights, title, interest, patents, trade secrets, copyrights, dynamic design 
+systems, and proprietary source code contained within this project are fully owned 
+and reserved by the Owner under international copyright laws, trade secret acts, 
+and intellectual property treaties.
+
+2. RESTRICTIONS ON USE
+----------------------
+Without prior explicit written authorization from the Owner, strict prohibition 
+applies to:
+- Copying, modifying, redistributing, selling, licensing, or sublicensing any part 
+  of this codebase or architectural design.
+- Decompiling, reverse engineering, disassembling, or deriving source code or API 
+  connector adapters from this Software.
+- Automated scraping, cloning, or commercial duplication of the PricePulse engine, 
+  price aggregation index, or optimization algorithms.
+
+3. TRADEMARKS & NOMINATIVE FAIR USE
+----------------------------------
+"PricePulse", "PricePulse Engine", and associated brand logos are trademarks of 
+PricePulse Technologies. Third-party brand names (including Blinkit, Zepto, Swiggy 
+Instamart, Flipkart Minutes, Amazon Fresh, and product manufacturers) mentioned within 
+the platform are used strictly under nominative fair use for real-time price indexing, 
+comparison, and user choice empowerment. All third-party trademarks remain the 
+property of their respective holders.
+
+4. SERVER & DISTRIBUTED DEPLOYMENT PROTECTION
+---------------------------------------------
+Any instance of this software running on public or private cloud servers, edge functions, 
+worker threads, or containerized environments remains governed by this license and 
+subject to active copyright enforcement.
+
+===============================================================================
+UNAUTHORIZED REPRODUCTION OR DISTRIBUTION OF THIS SOFTWARE OR ITS ALGORITHMS IS 
+STRICTLY PROHIBITED AND PUNISHABLE UNDER INTELLECTUAL PROPERTY LAWS.
+===============================================================================

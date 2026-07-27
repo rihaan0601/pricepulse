@@ -1,0 +1,35 @@
+{
+  "product_id": "sku_101",
+  "brand": "Amul",
+  "title": "Amul Taaza Toned Fresh Milk 1 L",
+  "gtin_barcode": "8901262010052",
+  "image_assets": [
+    {
+      "source_platform": "Blinkit",
+      "original_cdn_url": "https://images.unsplash.com/photo-1563636619-e9143da7973b?w=200&h=200&fit=crop",
+      "transformed_high_res_url": "https://images.unsplash.com/photo-1563636619-e9143da7973b?w=1200&h=200&fit=crop&q=90",
+      "local_file_path": "downloads/amul/sku_101/blinkit_1_1200x200.jpg",
+      "resolution": "1200x200",
+      "file_size_bytes": 43473,
+      "format": "jpg"
+    },
+    {
+      "source_platform": "Zepto",
+      "original_cdn_url": "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=250&q=70",
+      "transformed_high_res_url": "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=1200&q=90&fit=crop",
+      "local_file_path": "downloads/amul/sku_101/zepto_2_1200x1800.jpg",
+      "resolution": "1200x1800",
+      "file_size_bytes": 206026,
+      "format": "jpg"
+    },
+    {
+      "source_platform": "Instamart",
+      "original_cdn_url": "https://images.unsplash.com/photo-1563636619-e9143da7973b?tr=w-300,h-300",
+      "transformed_high_res_url": "https://images.unsplash.com/photo-1563636619-e9143da7973b?tr=w-1200%2Ch-1200%2Cq-100",
+      "local_file_path": "downloads/amul/sku_101/instamart_3_3072x3839.jpg",
+      "resolution": "3072x3839",
+      "file_size_bytes": 3891223,
+      "format": "jpg"
+    }
+  ]
+}

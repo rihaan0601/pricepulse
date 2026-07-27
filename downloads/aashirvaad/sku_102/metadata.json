@@ -1,0 +1,26 @@
+{
+  "product_id": "sku_102",
+  "brand": "Aashirvaad",
+  "title": "Aashirvaad Shudh Chakki Atta 5 kg",
+  "gtin_barcode": "8901058852327",
+  "image_assets": [
+    {
+      "source_platform": "Flipkart Minutes",
+      "original_cdn_url": "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=300&h=300&q=60",
+      "transformed_high_res_url": "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=1200&h=300&q=90&fit=crop",
+      "local_file_path": "downloads/aashirvaad/sku_102/flipkart_minutes_1_1200x300.jpg",
+      "resolution": "1200x300",
+      "file_size_bytes": 107610,
+      "format": "jpg"
+    },
+    {
+      "source_platform": "Amazon Fresh",
+      "original_cdn_url": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=200&fit=crop",
+      "transformed_high_res_url": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=1200&fit=crop&q=90",
+      "local_file_path": "downloads/aashirvaad/sku_102/amazon_fresh_2_1200x798.jpg",
+      "resolution": "1200x798",
+      "file_size_bytes": 360835,
+      "format": "jpg"
+    }
+  ]
+}
