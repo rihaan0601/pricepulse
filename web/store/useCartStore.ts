@@ -1,7 +1,15 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type PlatformName = 'zepto' | 'blinkit' | 'flipkart_minutes' | 'instamart' | 'amazon_now';
+export type PlatformName = 'ondc' | 'zepto' | 'blinkit' | 'instamart' | 'flipkart_minutes' | 'amazon_fresh';
+
+export interface PlatformPrice {
+  platform: PlatformName;
+  price: number;
+  mrp?: number;
+  inStock: boolean;
+  deliveryMins?: number;
+}
 
 export interface CartProduct {
   id: string;
@@ -9,8 +17,10 @@ export interface CartProduct {
   brand: string;
   unit: string;
   category: string;
+  gtin?: string;
+  mrp?: number;
   imageUrl?: string;
-  platforms: Array<{ platform: PlatformName; price: number; inStock: boolean }>;
+  platforms: PlatformPrice[];
 }
 
 export interface CartItem {
@@ -18,11 +28,27 @@ export interface CartItem {
   quantity: number;
 }
 
+export interface LocationPreset {
+  name: string;
+  pincode: string;
+  city: string;
+  area: string;
+}
+
+export const LOCATION_PRESETS: LocationPreset[] = [
+  { name: "HSR Layout", pincode: "560034", city: "Bengaluru", area: "Sector 3" },
+  { name: "Indiranagar", pincode: "560038", city: "Bengaluru", area: "100ft Road" },
+  { name: "Koramangala", pincode: "560095", city: "Bengaluru", area: "5th Block" },
+  { name: "Connaught Place", pincode: "110001", city: "New Delhi", area: "Inner Circle" },
+  { name: "Powai", pincode: "400076", city: "Mumbai", area: "Hiranandani" }
+];
+
 interface LocationContext {
   lat: number | null;
   lng: number | null;
-  pincode: string | null;
-  city: string | null;
+  pincode: string;
+  city: string;
+  area: string;
   isSet: boolean;
 }
 
@@ -30,6 +56,7 @@ interface CartStore {
   location: LocationContext;
   cart: CartItem[];
   setLocation: (loc: Partial<LocationContext>) => void;
+  selectLocationPreset: (pincode: string) => void;
   addToCart: (product: CartProduct) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, qty: number) => void;
@@ -41,17 +68,31 @@ export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       location: {
-        lat: null,
-        lng: null,
-        pincode: null,
-        city: null,
-        isSet: false,
+        lat: 12.9141,
+        lng: 77.6412,
+        pincode: "560034",
+        city: "Bengaluru",
+        area: "HSR Layout",
+        isSet: true,
       },
       cart: [],
       setLocation: (loc) =>
         set((state) => ({
           location: { ...state.location, ...loc, isSet: true },
         })),
+      selectLocationPreset: (pincodeStr) => {
+        const preset = LOCATION_PRESETS.find((p) => p.pincode === pincodeStr) || LOCATION_PRESETS[0];
+        set({
+          location: {
+            lat: 12.9141,
+            lng: 77.6412,
+            pincode: preset.pincode,
+            city: preset.city,
+            area: preset.name,
+            isSet: true,
+          },
+        });
+      },
       addToCart: (product) =>
         set((state) => {
           const existing = state.cart.find((item) => item.product.id === product.id);
