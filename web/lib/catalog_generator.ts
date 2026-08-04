@@ -1,4 +1,5 @@
 import { Product, PlatformDetails } from './catalog_data';
+import { getRealisticProductImage } from './productImageLibrary';
 
 const PLATFORMS = ['zepto', 'blinkit', 'instamart', 'flipkart_minutes', 'amazon_now'];
 
@@ -186,7 +187,7 @@ export function generateFullCatalog(): Product[] {
         brand: tmpl.brand,
         category: tmpl.category,
         subCategory: tmpl.subCategory,
-        imageUrl: tmpl.imageUrl,
+        imageUrl: getRealisticProductImage(variantName, tmpl.brand, tmpl.category),
         weight: weight,
         platforms,
       });

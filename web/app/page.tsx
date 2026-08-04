@@ -17,6 +17,7 @@ import SavingsBreakdownChart from '@/app/components/SavingsBreakdownChart';
 import PlatformOfferBadge from '@/app/components/PlatformOfferBadge';
 import { VENDORS, CANONICAL_CATALOG, PlatformId, CanonicalSKU } from '@/lib/vendorsAndCatalog';
 import { runCombinatorialOptimizer, generateONDCBecknPayload, generateAmazonMultiASINLink, simulateCartInjector, APPLIED_COUPONS } from '@/lib/cartOptimizer';
+import { getRealisticProductImage } from '@/lib/productImageLibrary';
 
 // Real items matching the exact photos
 const PHOTO_DEALS = [
