@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { 
-  Search, Mic, MapPin, Zap, ShoppingCart, Sparkles, Filter, Check, ChevronDown,
-  TrendingUp, Award, Bell, Share2, ExternalLink, ShieldCheck, ArrowRight, RefreshCw,
-  Gift, Percent, Clock, AlertTriangle, Layers, Split, Plus, Minus, Trash2, Cpu
+  Search, Mic, MapPin, Zap, ShoppingCart, Sparkles, Filter, Check, 
+  Award, Bell, Share2, ExternalLink, ShieldCheck, ArrowRight, RefreshCw,
+  Plus, Minus, Trash2, Cpu, Copy, CheckCircle2, AlertTriangle, Layers, Split, Clock
 } from 'lucide-react';
-import { useCartStore, LOCATION_PRESETS, CartProduct, PlatformName } from '@/store/useCartStore';
+import { useCartStore, LOCATION_PRESETS } from '@/store/useCartStore';
 import { useGamificationStore } from '@/store/useGamificationStore';
 import { useAnalyticsStore } from '@/store/useAnalyticsStore';
 import { useToast } from '@/app/components/ToastNotification';
@@ -14,183 +14,29 @@ import XPProgressBar from '@/app/components/XPProgressBar';
 import SavingsBadgeSystem from '@/app/components/SavingsBadgeSystem';
 import SavingsBreakdownChart from '@/app/components/SavingsBreakdownChart';
 import PlatformOfferBadge from '@/app/components/PlatformOfferBadge';
+import { VENDORS, CANONICAL_CATALOG, PlatformId, CanonicalSKU } from '@/lib/vendorsAndCatalog';
+import { runCombinatorialOptimizer, generateONDCBecknPayload, generateAmazonMultiASINLink, simulateCartInjector, APPLIED_COUPONS } from '@/lib/cartOptimizer';
 
-// Canonical sample items with exact real Unsplash URLs
-const SAMPLE_PRODUCTS: CartProduct[] = [
-  {
-    id: "p1",
-    title: "Amul Pasteurised Salted Butter",
-    brand: "Amul",
-    unit: "500g",
-    category: "Dairy & Breakfast",
-    gtin: "8901262010055",
-    mrp: 275,
-    imageUrl: "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=400&q=80",
-    platforms: [
-      { platform: "ondc", price: 262, inStock: true, deliveryMins: 15 },
-      { platform: "zepto", price: 268, inStock: true, deliveryMins: 7 },
-      { platform: "blinkit", price: 270, inStock: true, deliveryMins: 9 },
-      { platform: "instamart", price: 272, inStock: true, deliveryMins: 12 },
-      { platform: "flipkart_minutes", price: 265, inStock: true, deliveryMins: 10 },
-      { platform: "amazon_fresh", price: 259, inStock: true, deliveryMins: 60 },
-    ]
-  },
-  {
-    id: "p2",
-    title: "Aashirvaad Sharbati Superior Whole Wheat Atta",
-    brand: "Aashirvaad",
-    unit: "5kg",
-    category: "Staples & Atta",
-    gtin: "8901725111227",
-    mrp: 260,
-    imageUrl: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=400&q=80",
-    platforms: [
-      { platform: "ondc", price: 232, inStock: true, deliveryMins: 15 },
-      { platform: "zepto", price: 245, inStock: true, deliveryMins: 8 },
-      { platform: "blinkit", price: 248, inStock: true, deliveryMins: 9 },
-      { platform: "instamart", price: 250, inStock: true, deliveryMins: 14 },
-      { platform: "flipkart_minutes", price: 238, inStock: true, deliveryMins: 11 },
-      { platform: "amazon_fresh", price: 228, inStock: true, deliveryMins: 60 },
-    ]
-  },
-  {
-    id: "p3",
-    title: "Tata Tea Gold Fine Blend Rich CTC Tea",
-    brand: "Tata Consumer",
-    unit: "500g",
-    category: "Beverages & Drinks",
-    gtin: "8901030001008",
-    mrp: 310,
-    imageUrl: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=400&q=80",
-    platforms: [
-      { platform: "ondc", price: 275, inStock: true, deliveryMins: 15 },
-      { platform: "zepto", price: 282, inStock: true, deliveryMins: 7 },
-      { platform: "blinkit", price: 288, inStock: true, deliveryMins: 9 },
-      { platform: "instamart", price: 290, inStock: true, deliveryMins: 12 },
-      { platform: "flipkart_minutes", price: 280, inStock: true, deliveryMins: 10 },
-      { platform: "amazon_fresh", price: 269, inStock: true, deliveryMins: 60 },
-    ]
-  },
-  {
-    id: "p4",
-    title: "Fortune Sunlite Refined Sunflower Oil",
-    brand: "Fortune",
-    unit: "1L",
-    category: "Staples & Atta",
-    gtin: "8906007280014",
-    mrp: 155,
-    imageUrl: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=400&q=80",
-    platforms: [
-      { platform: "ondc", price: 135, inStock: true, deliveryMins: 15 },
-      { platform: "zepto", price: 142, inStock: true, deliveryMins: 7 },
-      { platform: "blinkit", price: 144, inStock: true, deliveryMins: 9 },
-      { platform: "instamart", price: 145, inStock: true, deliveryMins: 12 },
-      { platform: "flipkart_minutes", price: 138, inStock: true, deliveryMins: 10 },
-      { platform: "amazon_fresh", price: 132, inStock: true, deliveryMins: 60 },
-    ]
-  },
-  {
-    id: "p5",
-    title: "Maggi 2-Minute Masala Instant Noodles",
-    brand: "Nestle",
-    unit: "12-Pack (840g)",
-    category: "Snacks & Munchies",
-    gtin: "8901058852312",
-    mrp: 168,
-    imageUrl: "https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?auto=format&fit=crop&w=400&q=80",
-    platforms: [
-      { platform: "ondc", price: 148, inStock: true, deliveryMins: 15 },
-      { platform: "zepto", price: 156, inStock: true, deliveryMins: 7 },
-      { platform: "blinkit", price: 158, inStock: true, deliveryMins: 9 },
-      { platform: "instamart", price: 160, inStock: true, deliveryMins: 12 },
-      { platform: "flipkart_minutes", price: 152, inStock: true, deliveryMins: 10 },
-      { platform: "amazon_fresh", price: 145, inStock: true, deliveryMins: 60 },
-    ]
-  },
-  {
-    id: "p6",
-    title: "Nescafe Classic 100% Pure Instant Coffee",
-    brand: "Nestle",
-    unit: "100g Jar",
-    category: "Beverages & Drinks",
-    gtin: "8901058001000",
-    mrp: 360,
-    imageUrl: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=400&q=80",
-    platforms: [
-      { platform: "ondc", price: 315, inStock: true, deliveryMins: 15 },
-      { platform: "zepto", price: 330, inStock: true, deliveryMins: 7 },
-      { platform: "blinkit", price: 335, inStock: true, deliveryMins: 9 },
-      { platform: "instamart", price: 340, inStock: true, deliveryMins: 12 },
-      { platform: "flipkart_minutes", price: 325, inStock: true, deliveryMins: 10 },
-      { platform: "amazon_fresh", price: 310, inStock: true, deliveryMins: 60 },
-    ]
-  },
-  {
-    id: "p7",
-    title: "Dettol Original Germ Protection Bathing Soap",
-    brand: "Dettol",
-    unit: "4-Pack (125g each)",
-    category: "Personal Care & Hygiene",
-    gtin: "8901396001005",
-    mrp: 240,
-    imageUrl: "https://images.unsplash.com/photo-1607006482602-76ca97ac4759?auto=format&fit=crop&w=400&q=80",
-    platforms: [
-      { platform: "ondc", price: 198, inStock: true, deliveryMins: 15 },
-      { platform: "zepto", price: 210, inStock: true, deliveryMins: 7 },
-      { platform: "blinkit", price: 215, inStock: true, deliveryMins: 9 },
-      { platform: "instamart", price: 218, inStock: true, deliveryMins: 12 },
-      { platform: "flipkart_minutes", price: 205, inStock: true, deliveryMins: 10 },
-      { platform: "amazon_fresh", price: 195, inStock: true, deliveryMins: 60 },
-    ]
-  },
-  {
-    id: "p8",
-    title: "Mother Dairy Toned Fresh Milk",
-    brand: "Mother Dairy",
-    unit: "1L Pouch",
-    category: "Dairy & Breakfast",
-    gtin: "8901262000010",
-    mrp: 54,
-    imageUrl: "https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=400&q=80",
-    platforms: [
-      { platform: "ondc", price: 52, inStock: true, deliveryMins: 15 },
-      { platform: "zepto", price: 54, inStock: true, deliveryMins: 7 },
-      { platform: "blinkit", price: 54, inStock: true, deliveryMins: 8 },
-      { platform: "instamart", price: 54, inStock: true, deliveryMins: 10 },
-      { platform: "flipkart_minutes", price: 53, inStock: true, deliveryMins: 11 },
-      { platform: "amazon_fresh", price: 51, inStock: true, deliveryMins: 60 },
-    ]
-  }
-];
-
-const PLATFORM_DETAILS: Record<PlatformName, { name: string; color: string; bg: string; border: string; logo: string; sla: string }> = {
-  ondc: { name: 'ONDC Kirana', color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', logo: '🌐', sla: '~15 mins' },
-  zepto: { name: 'Zepto', color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/30', logo: '🟣', sla: '~7 mins' },
-  blinkit: { name: 'Blinkit', color: 'text-yellow-400', bg: 'bg-yellow-500/10', border: 'border-yellow-500/30', logo: '🟡', sla: '~9 mins' },
-  instamart: { name: 'Swiggy Instamart', color: 'text-orange-400', bg: 'bg-orange-500/10', border: 'border-orange-500/30', logo: '🟠', sla: '~12 mins' },
-  flipkart_minutes: { name: 'Flipkart Minutes', color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/30', logo: '🔵', sla: '~10 mins' },
-  amazon_fresh: { name: 'Amazon Fresh', color: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/30', logo: '🟧', sla: '~60 mins' },
-};
-
-export default function HighDensityDashboard() {
+export default function HighDensityMasterApp() {
   const { toast } = useToast();
   const { location, selectLocationPreset, cart, addToCart, removeFromCart, updateQuantity, clearCart } = useCartStore();
-  const { xp, level, recordCartOptimization } = useGamificationStore();
-  const { addSavings, totalSavings } = useAnalyticsStore();
+  const { recordCartOptimization } = useGamificationStore();
+  const { addSavings } = useAnalyticsStore();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedStrategy, setSelectedStrategy] = useState<'single' | 'split2' | 'split3' | 'fastest'>('split2');
   const [isListening, setIsListening] = useState(false);
-  const [alertModalProduct, setAlertModalProduct] = useState<CartProduct | null>(null);
+  const [alertModalProduct, setAlertModalProduct] = useState<CanonicalSKU | null>(null);
   const [targetPrice, setTargetPrice] = useState<number>(0);
   const [activeTabMobile, setActiveTabMobile] = useState<'compare' | 'cart' | 'radar' | 'profile'>('compare');
-  const [payloadModal, setPayloadModal] = useState<string | null>(null);
+  const [ondcPayloadModal, setOndcPayloadModal] = useState<string | null>(null);
+  const [injectorLogsModal, setInjectorLogsModal] = useState<string[] | null>(null);
 
-  // Speech-to-text Voice Dictation
+  // Web Speech API Dictation
   const handleVoiceSearch = () => {
     if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-      toast.error('Voice dictation is not supported in this browser.');
+      toast.error('Speech recognition not supported in this browser environment.');
       return;
     }
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -201,131 +47,104 @@ export default function HighDensityDashboard() {
 
     recognition.onstart = () => {
       setIsListening(true);
-      toast.info('Listening... Speak query now');
+      toast.info('Listening for spoken grocery query...');
     };
 
     recognition.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript;
       setSearchQuery(transcript);
       setIsListening(false);
-      toast.success(`Voice query recognized: "${transcript}"`);
+      toast.success(`Voice input recognized: "${transcript}"`);
     };
 
     recognition.onerror = () => {
       setIsListening(false);
-      toast.error('Voice recognition failed. Please try typing.');
+      toast.error('Voice dictation failed. Try typing.');
     };
 
     recognition.onend = () => setIsListening(false);
     recognition.start();
   };
 
-  // Filtered Products
-  const filteredProducts = SAMPLE_PRODUCTS.filter((p) => {
+  // Filter Products
+  const filteredProducts = CANONICAL_CATALOG.filter((p) => {
     const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           p.brand.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCat = selectedCategory === 'All' || p.category === selectedCategory;
-    return matchesSearch && matchesCat;
+    const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
+    return matchesSearch && matchesCategory;
   });
 
-  // Calculate Best Deal per product
-  const getBestDeal = (product: CartProduct) => {
+  // Calculate Best Price per item
+  const getBestVendor = (product: CanonicalSKU) => {
     const sorted = [...product.platforms].sort((a, b) => a.price - b.price);
     const winner = sorted[0];
-    const mrp = product.mrp || winner.price * 1.15;
-    const savings = mrp - winner.price;
-    const discountPct = Math.round((savings / mrp) * 100);
-    return { winner, mrp, savings, discountPct };
+    const savings = product.mrp - winner.price;
+    const discountPct = Math.round((savings / product.mrp) * 100);
+    return { winner, savings, discountPct };
   };
 
-  // Cart Optimizer Calculations
-  const calculateCartSplit = () => {
-    if (cart.length === 0) return null;
+  // Cart Combinatorial Optimization
+  const cartInputItems = cart.map((item) => {
+    const catalogSKU = CANONICAL_CATALOG.find((sku) => sku.id === item.product.id) || {
+      id: item.product.id,
+      title: item.product.title,
+      brand: item.product.brand,
+      unit: item.product.unit,
+      category: item.product.category,
+      gtin: item.product.gtin || "8901262010055",
+      mrp: item.product.mrp || 275,
+      imageUrl: item.product.imageUrl || "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=400&q=80",
+      description: "Package item",
+      platforms: item.product.platforms.map((p) => ({
+        platform: p.platform as PlatformId,
+        price: p.price,
+        mrp: item.product.mrp || 275,
+        inStock: p.inStock,
+        deliveryMins: p.deliveryMins || 10,
+        sellerId: `seller_${p.platform}`
+      }))
+    };
+    return { product: catalogSKU, quantity: item.quantity };
+  });
 
-    let totalMRP = 0;
-    let singleVendorCost = 0;
-    const itemSplits: Array<{ product: CartProduct; qty: number; winner: any; savings: number }> = [];
+  const optimizationResult = runCombinatorialOptimizer(cartInputItems, selectedStrategy);
 
-    cart.forEach((item) => {
-      const best = getBestDeal(item.product);
-      totalMRP += (item.product.mrp || best.winner.price) * item.quantity;
-      
-      let chosenPlatformPrice = best.winner;
-      if (selectedStrategy === 'fastest') {
-        // Find platform with lowest SLA
-        const fastestPlatform = [...item.product.platforms].sort((a, b) => (a.deliveryMins || 99) - (b.deliveryMins || 99))[0];
-        chosenPlatformPrice = fastestPlatform;
-      }
-
-      itemSplits.push({
-        product: item.product,
-        qty: item.quantity,
-        winner: chosenPlatformPrice,
-        savings: ((item.product.mrp || best.winner.price) - chosenPlatformPrice.price) * item.quantity,
-      });
-    });
-
-    const itemsSubtotal = itemSplits.reduce((acc, curr) => acc + curr.winner.price * curr.qty, 0);
-    
-    // Delivery fees calculation based on split count
-    const uniqueVendors = new Set(itemSplits.map((i) => i.winner.platform)).size;
-    const deliveryFee = uniqueVendors === 1 ? 0 : uniqueVendors * 15; // ₹15 fee per vendor if split
-    const grandTotal = itemsSubtotal + deliveryFee;
-    const netSavings = Math.max(0, totalMRP - grandTotal);
-
-    return { totalMRP, itemsSubtotal, deliveryFee, grandTotal, netSavings, itemSplits, uniqueVendors };
-  };
-
-  const cartAnalysis = calculateCartSplit();
-
-  const handleCheckoutHandoff = (type: 'ondc' | 'amazon' | 'injector') => {
-    if (!cartAnalysis || cart.length === 0) {
+  // Trigger Checkout Handoffs
+  const handleTriggerCheckout = (mode: 'ondc' | 'amazon' | 'injector') => {
+    if (!optimizationResult || cart.length === 0) {
       toast.error('Your cart is empty!');
       return;
     }
 
-    addSavings(cartAnalysis.netSavings, 'PricePulse Engine');
-    recordCartOptimization(cartAnalysis.netSavings);
+    addSavings(optimizationResult.totalNetSavings, 'PricePulse Combinatorial Engine');
+    recordCartOptimization(optimizationResult.totalNetSavings);
 
-    if (type === 'ondc') {
-      const ondcPayload = {
-        context: {
-          domain: "ONDC:RET10",
-          action: "select",
-          bap_id: "buyer-app.pricepulse.in",
-          bap_uri: "https://api.pricepulse.app/ondc",
-          pincode: location.pincode,
-          timestamp: new Date().toISOString()
-        },
-        message: {
-          order: {
-            items: cartAnalysis.itemSplits.map((i) => ({
-              id: i.product.gtin || i.product.id,
-              quantity: { count: i.qty },
-              platform: i.winner.platform,
-              price: i.winner.price
-            }))
-          }
-        }
-      };
-      setPayloadModal(JSON.stringify(ondcPayload, null, 2));
-      toast.success('ONDC Beckn Payload Generated! Protocol session ready.');
-    } else if (type === 'amazon') {
-      const amazonAsins = cartAnalysis.itemSplits.map((i, idx) => `ASIN.${idx+1}=${i.product.gtin || 'B00N0W03R4'}&Quantity.${idx+1}=${i.qty}`).join('&');
-      const url = `https://www.amazon.in/gp/aws/cart/add.html?${amazonAsins}&tag=pricepulse-21`;
-      window.open(url, '_blank');
-      toast.success('Opening Amazon Multi-ASIN Cart Link...');
-    } else {
-      toast.success('Executing cart_injector.js in WebView... Halting safely at RBI 2FA Payment Gate!');
+    if (mode === 'ondc') {
+      const payloadStr = generateONDCBecknPayload(optimizationResult.vendorSplits, location.pincode);
+      setOndcPayloadModal(payloadStr);
+      toast.success('ONDC Beckn Protocol Payload Generated!');
+    } else if (mode === 'amazon') {
+      const link = generateAmazonMultiASINLink(optimizationResult.vendorSplits);
+      window.open(link, '_blank');
+      toast.success('Launching Amazon Multi-ASIN Cart Link...');
+    } else if (mode === 'injector') {
+      const firstSplit = optimizationResult.vendorSplits[0];
+      if (firstSplit) {
+        const logs = simulateCartInjector(firstSplit);
+        setInjectorLogsModal(logs);
+        toast.success('Cart Injector Script Executed! Halting safely at RBI 2FA Payment Gate.');
+      }
     }
   };
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased pb-20 lg:pb-6">
-      {/* 1. HIGH DENSITY HEADER BAR */}
-      <header className="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-3 py-2">
+      
+      {/* 1. HIGH DENSITY HEADER */}
+      <header className="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-3 py-2">
         <div className="max-w-[1700px] mx-auto flex items-center justify-between gap-3">
-          {/* Logo Badge */}
+          
+          {/* Logo */}
           <div className="flex items-center space-x-2 shrink-0">
             <div className="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center font-black text-white text-sm tracking-tighter shadow-lg shadow-indigo-600/30">
               PP
@@ -334,14 +153,14 @@ export default function HighDensityDashboard() {
               <span className="text-base font-black tracking-tight text-white flex items-center gap-1">
                 PRICE<span className="text-indigo-500">PULSE</span>
               </span>
-              <span className="block text-[9px] font-bold text-slate-400 -mt-1 tracking-widest uppercase">Q-Commerce AI</span>
+              <span className="block text-[9px] font-bold text-slate-400 -mt-1 tracking-widest uppercase">Quick-Commerce AI</span>
             </div>
           </div>
 
-          {/* Dynamic Pincode Location Switcher */}
+          {/* Location Pincode Selector */}
           <div className="hidden sm:flex items-center bg-slate-800/80 border border-slate-700/80 rounded-xl px-2.5 py-1 text-xs">
             <MapPin className="w-3.5 h-3.5 text-indigo-400 mr-1.5 shrink-0" />
-            <span className="text-slate-300 font-semibold mr-1.5">{location.area} ({location.pincode}):</span>
+            <span className="text-slate-300 font-semibold mr-1 text-[11px]">{location.area} ({location.pincode}):</span>
             <select
               value={location.pincode}
               onChange={(e) => selectLocationPreset(e.target.value)}
@@ -355,20 +174,20 @@ export default function HighDensityDashboard() {
             </select>
           </div>
 
-          {/* Search Bar & Dictation */}
+          {/* Search Input & Dictation */}
           <div className="flex-1 max-w-xl relative">
             <div className="relative flex items-center">
               <Search className="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none" />
               <input
                 type="text"
-                placeholder='Search 1,250+ SKUs (e.g. "500g Amul butter under ₹300")'
+                placeholder='Search 1,250+ SKUs (e.g. "Find 500g butter and 5kg Atta under ₹400")'
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-9 pr-10 py-1.5 text-xs bg-slate-800/60 border border-slate-700/80 rounded-xl text-slate-100 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
               />
               <button
                 onClick={handleVoiceSearch}
-                title="Voice Dictation Search"
+                title="Voice Grocery List Dictation"
                 className={`absolute right-2 p-1 rounded-lg transition-colors ${
                   isListening ? 'bg-rose-500 text-white animate-pulse' : 'text-slate-400 hover:text-indigo-400'
                 }`}
@@ -378,7 +197,7 @@ export default function HighDensityDashboard() {
             </div>
           </div>
 
-          {/* Level / Cart Shortcuts */}
+          {/* XP Bar & Basket */}
           <div className="flex items-center space-x-3 shrink-0">
             <div className="hidden lg:block w-44">
               <XPProgressBar />
@@ -400,10 +219,10 @@ export default function HighDensityDashboard() {
         </div>
       </header>
 
-      {/* QUICK QUERY PILLS */}
+      {/* QUICK PROMPT PILLS */}
       <div className="bg-slate-900/50 border-b border-slate-800 px-3 py-1.5 overflow-x-auto no-scrollbar">
         <div className="max-w-[1700px] mx-auto flex items-center space-x-2 text-[11px]">
-          <span className="text-slate-400 font-semibold uppercase tracking-wider text-[10px] shrink-0">Quick Queries:</span>
+          <span className="text-slate-400 font-semibold uppercase tracking-wider text-[10px] shrink-0">Popular Prompts:</span>
           {[
             { label: '🧈 Amul Butter 500g', q: 'Amul Butter' },
             { label: '🌾 Aashirvaad Atta 5kg', q: 'Aashirvaad Atta' },
@@ -430,7 +249,6 @@ export default function HighDensityDashboard() {
         {/* LEFT COLUMN: CATALOG COMPARISON FEED (5 COLS)                       */}
         {/* =================================================================== */}
         <section className={`lg:col-span-5 space-y-3 ${activeTabMobile === 'compare' ? 'block' : 'hidden lg:block'}`}>
-          {/* Feed Header Controls */}
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-2.5 flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <span className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1">
@@ -441,33 +259,29 @@ export default function HighDensityDashboard() {
               </span>
             </div>
 
-            {/* Category Filter */}
-            <div className="flex items-center space-x-2">
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="bg-slate-800 border border-slate-700 text-slate-300 text-xs rounded-lg px-2 py-1 outline-none font-medium cursor-pointer"
-              >
-                <option value="All">All Categories</option>
-                <option value="Dairy & Breakfast">Dairy & Breakfast</option>
-                <option value="Staples & Atta">Staples & Atta</option>
-                <option value="Snacks & Munchies">Snacks & Munchies</option>
-                <option value="Beverages & Drinks">Beverages & Drinks</option>
-                <option value="Personal Care & Hygiene">Personal Care</option>
-              </select>
-            </div>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="bg-slate-800 border border-slate-700 text-slate-300 text-xs rounded-lg px-2 py-1 outline-none font-medium cursor-pointer"
+            >
+              <option value="All">All Categories</option>
+              <option value="Dairy & Breakfast">Dairy & Breakfast</option>
+              <option value="Staples & Atta">Staples & Atta</option>
+              <option value="Snacks & Munchies">Snacks & Munchies</option>
+              <option value="Beverages & Drinks">Beverages & Drinks</option>
+              <option value="Personal Care & Hygiene">Personal Care</option>
+            </select>
           </div>
 
-          {/* Product Feed Grid */}
+          {/* Product Feed Cards */}
           <div className="space-y-3 max-h-[calc(100vh-180px)] overflow-y-auto pr-1 no-scrollbar">
             {filteredProducts.map((product) => {
-              const { winner, mrp, savings, discountPct } = getBestDeal(product);
+              const { winner, savings, discountPct } = getBestVendor(product);
               return (
                 <div 
                   key={product.id}
                   className="bg-slate-900/90 border border-slate-800 hover:border-indigo-500/50 rounded-xl p-3 space-y-2.5 transition-all shadow-md"
                 >
-                  {/* Top Row: Image + Title + Best Deal Badge */}
                   <div className="flex items-start space-x-3">
                     <img 
                       src={product.imageUrl} 
@@ -493,7 +307,7 @@ export default function HighDensityDashboard() {
                   {/* 6-VENDOR PRICE COMPARISON MATRIX */}
                   <div className="grid grid-cols-3 sm:grid-cols-6 gap-1 bg-slate-950 p-1.5 rounded-lg border border-slate-800/80">
                     {product.platforms.map((p) => {
-                      const details = PLATFORM_DETAILS[p.platform];
+                      const v = VENDORS[p.platform as PlatformId];
                       const isWinner = p.platform === winner.platform;
                       return (
                         <div 
@@ -505,8 +319,8 @@ export default function HighDensityDashboard() {
                           }`}
                         >
                           <div className="text-[9px] font-semibold text-slate-400 truncate flex items-center justify-center gap-0.5">
-                            <span>{details.logo}</span>
-                            <span className="truncate">{details.name.split(' ')[0]}</span>
+                            <span>{v?.logoEmoji || '🛒'}</span>
+                            <span className="truncate">{v?.shortName || p.platform}</span>
                           </div>
                           <div className={`text-xs font-black mt-0.5 ${isWinner ? 'text-emerald-400' : 'text-slate-200'}`}>
                             ₹{p.price}
@@ -517,13 +331,13 @@ export default function HighDensityDashboard() {
                     })}
                   </div>
 
-                  {/* Best Deal Winner Summary & Actions */}
+                  {/* Winner Summary & Action Buttons */}
                   <div className="flex items-center justify-between pt-1">
                     <div className="flex items-center space-x-1.5">
                       <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-black px-2 py-0.5 rounded flex items-center gap-1">
-                        👑 Best: ₹{winner.price} on {PLATFORM_DETAILS[winner.platform].name}
+                        👑 Lowest: ₹{winner.price} on {VENDORS[winner.platform as PlatformId]?.shortName}
                       </span>
-                      <span className="text-[10px] text-slate-400 line-through">₹{mrp}</span>
+                      <span className="text-[10px] text-slate-400 line-through">₹{product.mrp}</span>
                     </div>
 
                     <div className="flex items-center space-x-1.5">
@@ -532,14 +346,14 @@ export default function HighDensityDashboard() {
                           setAlertModalProduct(product);
                           setTargetPrice(winner.price - 10);
                         }}
-                        title="Set Price Alert"
+                        title="Set Price Alert Monitor"
                         className="p-1.5 bg-slate-800 hover:bg-amber-500/20 text-slate-400 hover:text-amber-400 border border-slate-700 rounded-lg transition"
                       >
                         <Bell className="w-3.5 h-3.5" />
                       </button>
 
                       <button
-                        onClick={() => addToCart(product)}
+                        onClick={() => addToCart(product as any)}
                         className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg shadow-sm flex items-center gap-1 transition"
                       >
                         <Plus className="w-3.5 h-3.5" /> Add
@@ -559,7 +373,7 @@ export default function HighDensityDashboard() {
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-3">
             <div className="flex items-center justify-between">
               <h2 className="text-xs font-black uppercase tracking-wider text-slate-200 flex items-center gap-1.5">
-                <Split className="w-4 h-4 text-indigo-400" /> Smart Cart Partition Engine
+                <Split className="w-4 h-4 text-indigo-400" /> Smart Cart Partitioning Engine
               </h2>
               {cart.length > 0 && (
                 <button 
@@ -598,94 +412,119 @@ export default function HighDensityDashboard() {
               <div className="py-8 text-center space-y-2 border border-dashed border-slate-800 rounded-xl">
                 <ShoppingCart className="w-8 h-8 text-slate-600 mx-auto" />
                 <p className="text-xs font-semibold text-slate-400">Your basket is empty</p>
-                <p className="text-[10px] text-slate-500">Add products from the feed to compare split savings</p>
+                <p className="text-[10px] text-slate-500">Add products from the catalog feed to compare split savings</p>
               </div>
             ) : (
-              <div className="space-y-2 max-h-56 overflow-y-auto pr-1 no-scrollbar">
-                {cart.map((item) => {
-                  const best = getBestDeal(item.product);
-                  return (
-                    <div key={item.product.id} className="bg-slate-950 p-2 rounded-lg border border-slate-800 flex items-center justify-between text-xs">
-                      <div className="flex-1 min-w-0 pr-2">
-                        <div className="font-bold text-slate-200 truncate">{item.product.title}</div>
-                        <div className="text-[10px] text-slate-400 flex items-center space-x-1">
-                          <span>₹{best.winner.price} ea</span>
-                          <span>•</span>
-                          <span className="text-emerald-400 font-semibold">{PLATFORM_DETAILS[best.winner.platform].name}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-1.5 shrink-0">
-                        <button
-                          onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                          className="w-5 h-5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded flex items-center justify-center font-bold"
-                        >
-                          <Minus className="w-3 h-3" />
-                        </button>
-                        <span className="font-mono font-bold text-white px-1">{item.quantity}</span>
-                        <button
-                          onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                          className="w-5 h-5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded flex items-center justify-center font-bold"
-                        >
-                          <Plus className="w-3 h-3" />
-                        </button>
+              <div className="space-y-2 max-h-52 overflow-y-auto pr-1 no-scrollbar">
+                {cart.map((item) => (
+                  <div key={item.product.id} className="bg-slate-950 p-2 rounded-lg border border-slate-800 flex items-center justify-between text-xs">
+                    <div className="flex-1 min-w-0 pr-2">
+                      <div className="font-bold text-slate-200 truncate">{item.product.title}</div>
+                      <div className="text-[10px] text-slate-400 flex items-center space-x-1">
+                        <span>₹{item.product.mrp} MRP</span>
                       </div>
                     </div>
-                  );
-                })}
+
+                    <div className="flex items-center space-x-1.5 shrink-0">
+                      <button
+                        onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                        className="w-5 h-5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded flex items-center justify-center font-bold"
+                      >
+                        <Minus className="w-3 h-3" />
+                      </button>
+                      <span className="font-mono font-bold text-white px-1">{item.quantity}</span>
+                      <button
+                        onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                        className="w-5 h-5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded flex items-center justify-center font-bold"
+                      >
+                        <Plus className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
 
-            {/* Savings & Order Summary */}
-            {cartAnalysis && (
+            {/* Combinatorial Optimizer Summary */}
+            {optimizationResult && (
               <div className="space-y-2.5 pt-2 border-t border-slate-800">
                 <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-2.5 flex items-center justify-between">
                   <div>
                     <span className="block text-[10px] font-bold uppercase tracking-wider text-emerald-400">Total Net Savings</span>
-                    <span className="text-lg font-black text-emerald-300">₹{cartAnalysis.netSavings}</span>
+                    <span className="text-lg font-black text-emerald-300">₹{optimizationResult.totalNetSavings} ({optimizationResult.savingsPercentage}%)</span>
                   </div>
                   <div className="text-right text-[10px] text-slate-400">
-                    <div>MRP Total: <span className="line-through">₹{cartAnalysis.totalMRP}</span></div>
-                    <div>{cartAnalysis.uniqueVendors} Vendor Split(s)</div>
+                    <div>MRP Total: <span className="line-through">₹{optimizationResult.totalMRP}</span></div>
+                    <div>Pay: <span className="font-bold text-white">₹{optimizationResult.grandTotalCost}</span></div>
                   </div>
                 </div>
 
-                {/* Stackable Coupon Offer Badges */}
-                <div className="flex flex-wrap gap-1.5">
-                  <PlatformOfferBadge code="HDFC100" paymentMethod="HDFC Bank" discountLabel="-₹100" platform="ONDC" />
-                  <PlatformOfferBadge code="CRED50" paymentMethod="CRED Pay" discountLabel="-₹50" platform="Zepto" />
-                  <PlatformOfferBadge code="ZEPTOFIRST" paymentMethod="UPI" discountLabel="Free Deliv" platform="Zepto" />
+                {/* Stackable Platform Coupon Offers */}
+                <div className="flex flex-wrap gap-1">
+                  {APPLIED_COUPONS.map((coupon) => (
+                    <button
+                      key={coupon.code}
+                      onClick={() => {
+                        navigator.clipboard.writeText(coupon.code);
+                        toast.success(`Coupon code ${coupon.code} copied to clipboard!`);
+                      }}
+                      title="Click to copy coupon"
+                    >
+                      <PlatformOfferBadge 
+                        code={coupon.code} 
+                        paymentMethod={coupon.paymentMethod} 
+                        discountLabel={`-₹${coupon.discountAmount}`} 
+                        platform={VENDORS[coupon.vendorId].shortName} 
+                      />
+                    </button>
+                  ))}
                 </div>
 
-                {/* Itemized Savings Bar Graph */}
+                {/* Itemized Savings Breakdown Bar Chart */}
                 <SavingsBreakdownChart 
-                  items={cartAnalysis.itemSplits.map((i) => ({
-                    title: i.product.title,
-                    savings: i.savings,
-                    platform: PLATFORM_DETAILS[i.winner.platform].name
+                  items={optimizationResult.itemSavingsBreakdown.map((i) => ({
+                    title: i.productTitle,
+                    savings: i.itemSavings,
+                    platform: i.winningVendor
                   }))} 
                 />
 
-                {/* Checkout & Handoff Buttons */}
+                {/* Vendor Order Splits */}
+                <div className="space-y-1.5 pt-1">
+                  <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Partitioned Store Orders ({optimizationResult.vendorSplits.length}):</span>
+                  {optimizationResult.vendorSplits.map((split) => (
+                    <div key={split.vendorId} className="bg-slate-950 p-2 rounded-lg border border-slate-800 text-xs flex items-center justify-between">
+                      <div>
+                        <span className="font-bold text-slate-200">{split.logoEmoji} {split.vendorName}</span>
+                        <span className="block text-[9px] text-slate-400">{split.items.length} item(s) • {split.deliverySLA}</span>
+                      </div>
+                      <div className="text-right font-mono font-bold text-slate-200">
+                        ₹{split.vendorTotal}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Checkout Handoff Options */}
                 <div className="space-y-1.5 pt-1">
                   <button
-                    onClick={() => handleCheckoutHandoff('ondc')}
+                    onClick={() => handleTriggerCheckout('ondc')}
                     className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-1.5 transition"
                   >
-                    <span>🟢 ONDC Native Checkout Session</span>
+                    <span>🟢 ONDC Beckn Transaction Schema</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
 
                   <div className="grid grid-cols-2 gap-1.5">
                     <button
-                      onClick={() => handleCheckoutHandoff('amazon')}
+                      onClick={() => handleTriggerCheckout('amazon')}
                       className="py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[11px] font-bold rounded-xl flex items-center justify-center gap-1 transition"
                     >
                       <span>🟧 Amazon Multi-ASIN</span>
                     </button>
 
                     <button
-                      onClick={() => handleCheckoutHandoff('injector')}
+                      onClick={() => handleTriggerCheckout('injector')}
                       className="py-1.5 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 text-[11px] font-bold rounded-xl flex items-center justify-center gap-1 transition"
                     >
                       <Cpu className="w-3 h-3" />
@@ -711,23 +550,23 @@ export default function HighDensityDashboard() {
               </h2>
               <span className="flex items-center space-x-1 text-[9px] text-emerald-400 font-mono">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
-                <span>~12ms Ping</span>
+                <span>12ms Ping</span>
               </span>
             </div>
 
             <div className="space-y-1.5 text-xs">
-              {Object.entries(PLATFORM_DETAILS).map(([key, p]) => (
-                <div key={key} className="bg-slate-950 p-2 rounded-lg border border-slate-800/80 flex items-center justify-between">
+              {Object.values(VENDORS).map((v) => (
+                <div key={v.id} className="bg-slate-950 p-2 rounded-lg border border-slate-800/80 flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <span className="text-base">{p.logo}</span>
+                    <span className="text-base">{v.logoEmoji}</span>
                     <div>
-                      <div className="font-bold text-slate-200 text-[11px]">{p.name}</div>
-                      <div className="text-[9px] text-slate-400">Pincode {location.pincode}</div>
+                      <div className="font-bold text-slate-200 text-[11px]">{v.name}</div>
+                      <div className="text-[9px] text-slate-400">{location.area} ({location.pincode})</div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className={`font-mono font-black text-xs ${p.color}`}>{p.sla}</div>
-                    <div className="text-[8px] text-slate-500">Free &gt; ₹199</div>
+                    <div className={`font-mono font-black text-xs ${v.brandColor}`}>{v.deliverySLA}</div>
+                    <div className="text-[8px] text-slate-500">Free &gt; ₹{v.freeDeliveryThreshold}</div>
                   </div>
                 </div>
               ))}
@@ -735,11 +574,11 @@ export default function HighDensityDashboard() {
 
             <div className="bg-amber-500/10 border border-amber-500/30 p-2 rounded-lg text-[10px] text-amber-300 flex items-center space-x-1.5">
               <AlertTriangle className="w-4 h-4 shrink-0 text-amber-400" />
-              <span>Surge Fee Notice: +₹15 active in HSR Layout due to evening peak demand.</span>
+              <span>Peak Demand Notice: +₹15 surge active in {location.area} due to high store load.</span>
             </div>
           </div>
 
-          {/* User Progression & Gamification */}
+          {/* Gamification & Progress */}
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-3">
             <h2 className="text-xs font-black uppercase tracking-wider text-slate-200 flex items-center gap-1.5">
               <Award className="w-4 h-4 text-purple-400" /> Gamification & Achievements
@@ -748,7 +587,7 @@ export default function HighDensityDashboard() {
             <XPProgressBar />
 
             <div className="pt-1">
-              <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Unlocked Badges</span>
+              <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Unlocked Trophies</span>
               <SavingsBadgeSystem compact={false} />
             </div>
 
@@ -760,7 +599,7 @@ export default function HighDensityDashboard() {
                   { name: 'ONDC Kirana', pct: 45, color: 'bg-emerald-500' },
                   { name: 'Blinkit', pct: 25, color: 'bg-yellow-500' },
                   { name: 'Zepto', pct: 18, color: 'bg-purple-500' },
-                  { name: 'Amazon / Others', pct: 12, color: 'bg-amber-500' },
+                  { name: 'Amazon / FK', pct: 12, color: 'bg-amber-500' },
                 ].map((item) => (
                   <div key={item.name} className="space-y-0.5 text-[10px]">
                     <div className="flex justify-between font-semibold text-slate-300">
@@ -788,60 +627,60 @@ export default function HighDensityDashboard() {
                 <h3 className="font-bold text-sm text-slate-100">Set Price Drop Monitor</h3>
                 <p className="text-xs text-slate-400">{alertModalProduct.title}</p>
               </div>
-              <button onClick={() => setAlertModalProduct(null)} className="text-slate-400 hover:text-white text-xs">✕</button>
+              <button onClick={() => setAlertModalProduct(null)} className="text-slate-400 hover:text-white text-xs font-bold">✕</button>
             </div>
 
             <div className="space-y-2 text-xs">
-              <label className="block font-semibold text-slate-300">Target Price (₹):</label>
+              <label className="block font-semibold text-slate-300">Target Alert Price (₹):</label>
               <input
                 type="number"
                 value={targetPrice}
                 onChange={(e) => setTargetPrice(Number(e.target.value))}
                 className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 font-bold outline-none focus:border-amber-500"
               />
-              <p className="text-[10px] text-slate-400">Current Best Price: ₹{getBestDeal(alertModalProduct).winner.price}</p>
+              <p className="text-[10px] text-slate-400">Current Lowest: ₹{getBestVendor(alertModalProduct).winner.price}</p>
             </div>
 
             <button
               onClick={() => {
-                toast.success(`Price alert set for ₹${targetPrice}! We'll send PWA push notifications.`);
+                toast.success(`Price drop monitor configured for ₹${targetPrice}! PWA Push Notification active.`);
                 setAlertModalProduct(null);
               }}
               className="w-full py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow-lg transition"
             >
-              Confirm Alert
+              Confirm Alert Monitor
             </button>
           </div>
         </div>
       )}
 
-      {/* ONDC PAYLOAD PREVIEW MODAL */}
-      {payloadModal && (
+      {/* ONDC PAYLOAD MODAL */}
+      {ondcPayloadModal && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 max-w-lg w-full space-y-3 shadow-2xl">
             <div className="flex justify-between items-center">
               <h3 className="font-bold text-xs text-emerald-400 uppercase tracking-wider flex items-center gap-1">
-                <span>🟢</span> ONDC Beckn Protocol JSON Payload
+                <span>🟢</span> ONDC Beckn Protocol JSON Payload (/select & /init)
               </h3>
-              <button onClick={() => setPayloadModal(null)} className="text-slate-400 hover:text-white text-xs">✕</button>
+              <button onClick={() => setOndcPayloadModal(null)} className="text-slate-400 hover:text-white text-xs font-bold">✕</button>
             </div>
 
-            <pre className="bg-slate-950 p-3 rounded-xl border border-slate-800 text-[10px] font-mono text-emerald-300 max-h-60 overflow-y-auto no-scrollbar">
-              {payloadModal}
+            <pre className="bg-slate-950 p-3 rounded-xl border border-slate-800 text-[10px] font-mono text-emerald-300 max-h-64 overflow-y-auto no-scrollbar">
+              {ondcPayloadModal}
             </pre>
 
             <div className="flex justify-end space-x-2">
               <button
                 onClick={() => {
-                  navigator.clipboard.writeText(payloadModal);
-                  toast.success('Payload copied to clipboard!');
+                  navigator.clipboard.writeText(ondcPayloadModal);
+                  toast.success('ONDC Beckn JSON copied!');
                 }}
                 className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg text-slate-200"
               >
                 Copy Payload
               </button>
               <button
-                onClick={() => setPayloadModal(null)}
+                onClick={() => setOndcPayloadModal(null)}
                 className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-xs font-bold rounded-lg text-white"
               >
                 Done
@@ -851,7 +690,39 @@ export default function HighDensityDashboard() {
         </div>
       )}
 
-      {/* MOBILE STICKY BOTTOM NAVIGATION BAR */}
+      {/* INJECTOR LOGS MODAL */}
+      {injectorLogsModal && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 max-w-lg w-full space-y-3 shadow-2xl">
+            <div className="flex justify-between items-center">
+              <h3 className="font-bold text-xs text-indigo-400 uppercase tracking-wider flex items-center gap-1">
+                <Cpu className="w-4 h-4" /> cart_injector.js WebView DOM Autofill Logs
+              </h3>
+              <button onClick={() => setInjectorLogsModal(null)} className="text-slate-400 hover:text-white text-xs font-bold">✕</button>
+            </div>
+
+            <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 text-[10px] font-mono text-indigo-300 space-y-1 max-h-64 overflow-y-auto no-scrollbar">
+              {injectorLogsModal.map((log, i) => (
+                <div key={i} className="flex items-start space-x-1.5">
+                  <span className="text-slate-600">&gt;</span>
+                  <span>{log}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex justify-end">
+              <button
+                onClick={() => setInjectorLogsModal(null)}
+                className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-xs font-bold rounded-lg text-white"
+              >
+                Close Logs
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* STICKY MOBILE NAVIGATION */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800 flex justify-around items-center h-14 text-[10px] font-bold">
         <button
           onClick={() => setActiveTabMobile('compare')}
