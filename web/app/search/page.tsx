@@ -20,6 +20,7 @@ import ScrollReveal from '../components/ScrollReveal';
 import ProductShareButton from '../components/ProductShareButton';
 import EmptyState from '../components/EmptyState';
 import { useLivePriceStream } from '@/hooks/useLivePriceStream';
+import { getRealisticProductImage } from '@/lib/productImageLibrary';
 
 const CATEGORY_EMOJIS: Record<string, string> = {
   'Grocery & Fresh': '🥦',
@@ -346,18 +347,15 @@ export default function SearchPage() {
 
                       {/* Product Image */}
                       <div className="relative w-full h-44 mb-3 bg-secondary/30 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-[1.02] transition-transform duration-300">
-                        {product.imageUrl ? (
-                          <img
-                            src={product.imageUrl}
-                            alt={product.title}
-                            className="w-full h-full object-cover rounded-xl"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <span className="text-5xl">{CATEGORY_EMOJIS[product.category] || '📦'}</span>
-                        )}
-                        <span className="absolute bottom-2 right-2 text-xs font-semibold text-white bg-black/70 backdrop-blur-md px-2 py-0.5 rounded-md border border-white/10">
-                          {product.unit}
+                        <img
+                          src={getRealisticProductImage(product.title, product.brand, product.category)}
+                          alt={product.title}
+                          className="w-full h-full object-cover rounded-xl"
+                          loading="lazy"
+                        />
+                        {/* Pack Quantity / Weight Badge */}
+                        <span className="absolute top-2 right-2 text-[10px] font-black text-white bg-indigo-600/90 backdrop-blur-md px-2 py-0.5 rounded-lg border border-indigo-400/30 shadow-md">
+                          {product.unit || '1 Unit'}
                         </span>
                       </div>
 
