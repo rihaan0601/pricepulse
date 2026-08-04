@@ -28,7 +28,7 @@ const PHOTO_DEALS = [
     platformTag: "ONDC NETWORK",
     price: 260,
     mrp: 285,
-    imageUrl: "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=400&q=80",
+    imageUrl: "/products/amul_butter.jpg",
     catalogId: "sku-001"
   },
   {
@@ -39,7 +39,7 @@ const PHOTO_DEALS = [
     platformTag: "ONDC NETWORK",
     price: 275,
     mrp: 340,
-    imageUrl: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=400&q=80",
+    imageUrl: "/products/aashirvaad_atta.jpg",
     catalogId: "sku-002"
   },
   {
@@ -50,7 +50,7 @@ const PHOTO_DEALS = [
     platformTag: "ONDC NETWORK",
     price: 122,
     mrp: 165,
-    imageUrl: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=400&q=80",
+    imageUrl: "/products/fortune_oil.jpg",
     catalogId: "sku-004"
   },
   {
@@ -61,7 +61,7 @@ const PHOTO_DEALS = [
     platformTag: "ONDC NETWORK",
     price: 52,
     mrp: 56,
-    imageUrl: "https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=400&q=80",
+    imageUrl: "/products/mother_dairy_milk.jpg",
     catalogId: "sku-008"
   },
   {
@@ -72,7 +72,7 @@ const PHOTO_DEALS = [
     platformTag: "ONDC NETWORK",
     price: 280,
     mrp: 375,
-    imageUrl: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=400&q=80",
+    imageUrl: "/products/tata_tea_gold.jpg",
     catalogId: "sku-003"
   },
   {
@@ -83,7 +83,7 @@ const PHOTO_DEALS = [
     platformTag: "ONDC NETWORK",
     price: 315,
     mrp: 385,
-    imageUrl: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=400&q=80",
+    imageUrl: "/products/nescafe_classic.jpg",
     catalogId: "sku-006"
   }
 ];
@@ -96,7 +96,7 @@ const PHOTO_COMPARISONS = [
     title: "Fortune Sunlite Refined Sunflower Oil",
     unitTag: "1L Pouch",
     description: "Light and clear edible sunflower oil rich in Vitamin E for healthy cooking.",
-    imageUrl: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=400&q=80",
+    imageUrl: "/products/fortune_oil.jpg",
     bestDealPrice: 122,
     bestDealPlatform: "ONDC Network",
     savingsVsMRP: 43,
@@ -118,7 +118,7 @@ const PHOTO_COMPARISONS = [
     title: "Cadbury Dairy Milk Silk Chocolate",
     unitTag: "150g Bar",
     description: "Rich, smooth and creamy chocolate made from fine cocoa beans.",
-    imageUrl: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=400&q=80",
+    imageUrl: "/products/amul_butter.jpg",
     bestDealPrice: 148,
     bestDealPlatform: "ONDC Network",
     savingsVsMRP: 37,
@@ -140,7 +140,7 @@ const PHOTO_COMPARISONS = [
     title: "Maggi 2-Minute Masala Instant Noodles",
     unitTag: "12 Packs (840g)",
     description: "Iconic 2-minute instant noodles enriched with roasted spices and goodness of wheat.",
-    imageUrl: "https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?auto=format&fit=crop&w=400&q=80",
+    imageUrl: "/products/maggi_noodles.jpg",
     bestDealPrice: 155,
     bestDealPlatform: "ONDC Network",
     savingsVsMRP: 25,
@@ -162,7 +162,7 @@ const PHOTO_COMPARISONS = [
     title: "Dettol Original Germ Protection Bathing Soap",
     unitTag: "125g (Pack of 4)",
     description: "Provides 100% better germ protection compared to ordinary soaps.",
-    imageUrl: "https://images.unsplash.com/photo-1607006482602-76ca97ac4759?auto=format&fit=crop&w=400&q=80",
+    imageUrl: "/products/dettol_soap.jpg",
     bestDealPrice: 175,
     bestDealPlatform: "ONDC Network",
     savingsVsMRP: 65,
@@ -201,7 +201,7 @@ export default function ExactMatchMasterApp() {
       platform: "ONDC Network",
       currentBest: 260,
       targetAlert: 250,
-      imageUrl: "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=400&q=80"
+      imageUrl: "/products/amul_butter.jpg"
     },
     {
       id: "a2",
@@ -210,7 +210,7 @@ export default function ExactMatchMasterApp() {
       platform: "ONDC Network",
       currentBest: 999,
       targetAlert: 899,
-      imageUrl: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=400&q=80"
+      imageUrl: "/products/amul_butter.jpg"
     }
   ]);
 
@@ -250,7 +250,7 @@ export default function ExactMatchMasterApp() {
       category: item.product.category,
       gtin: item.product.gtin || "8901262010055",
       mrp: item.product.mrp || 275,
-      imageUrl: item.product.imageUrl || "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=400&q=80",
+      imageUrl: item.product.imageUrl || "/products/amul_butter.jpg",
       description: "Package item",
       platforms: item.product.platforms.map((p) => ({
         platform: p.platform as PlatformId,

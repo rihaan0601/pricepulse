@@ -147,7 +147,7 @@ export const CANONICAL_CATALOG: CanonicalSKU[] = [
     category: "Dairy & Breakfast",
     gtin: "8901262010055",
     mrp: 275,
-    imageUrl: "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=400&q=80",
+    imageUrl: "/products/amul_butter.jpg",
     description: "Wholesome fresh butter made from pure milk fat with iconic taste.",
     platforms: [
       { platform: "ondc", price: 258, mrp: 275, inStock: true, deliveryMins: 15, sellerId: "ondc_amul_500" },
@@ -166,7 +166,7 @@ export const CANONICAL_CATALOG: CanonicalSKU[] = [
     category: "Staples & Atta",
     gtin: "8901725111227",
     mrp: 260,
-    imageUrl: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=400&q=80",
+    imageUrl: "/products/aashirvaad_atta.jpg",
     description: "100% pure MP Sharbati wheat flour milled to perfection for soft rotis.",
     platforms: [
       { platform: "ondc", price: 228, mrp: 260, inStock: true, deliveryMins: 15, sellerId: "ondc_atta_5" },
@@ -185,7 +185,7 @@ export const CANONICAL_CATALOG: CanonicalSKU[] = [
     category: "Beverages & Drinks",
     gtin: "8901030001008",
     mrp: 310,
-    imageUrl: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=400&q=80",
+    imageUrl: "/products/tata_tea_gold.jpg",
     description: "Fine blend of Assam CTC tea leaves with long leaf aroma.",
     platforms: [
       { platform: "ondc", price: 272, mrp: 310, inStock: true, deliveryMins: 15, sellerId: "ondc_tata_500" },
@@ -204,7 +204,7 @@ export const CANONICAL_CATALOG: CanonicalSKU[] = [
     category: "Staples & Atta",
     gtin: "8906007280014",
     mrp: 155,
-    imageUrl: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=400&q=80",
+    imageUrl: "/products/fortune_oil.jpg",
     description: "Light and healthy cooking oil enriched with Vitamin A & D.",
     platforms: [
       { platform: "ondc", price: 132, mrp: 155, inStock: true, deliveryMins: 15, sellerId: "ondc_fortune_1l" },
@@ -223,7 +223,7 @@ export const CANONICAL_CATALOG: CanonicalSKU[] = [
     category: "Snacks & Munchies",
     gtin: "8901058852312",
     mrp: 168,
-    imageUrl: "https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?auto=format&fit=crop&w=400&q=80",
+    imageUrl: "/products/maggi_noodles.jpg",
     description: "Iconic masala instant noodles enriched with iron.",
     platforms: [
       { platform: "ondc", price: 145, mrp: 168, inStock: true, deliveryMins: 15, sellerId: "ondc_maggi_12p" },
@@ -242,7 +242,7 @@ export const CANONICAL_CATALOG: CanonicalSKU[] = [
     category: "Beverages & Drinks",
     gtin: "8901058001000",
     mrp: 360,
-    imageUrl: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=400&q=80",
+    imageUrl: "/products/nescafe_classic.jpg",
     description: "Rich aroma and signature bold flavor from premium coffee beans.",
     platforms: [
       { platform: "ondc", price: 310, mrp: 360, inStock: true, deliveryMins: 15, sellerId: "ondc_nescafe_100" },
@@ -261,7 +261,7 @@ export const CANONICAL_CATALOG: CanonicalSKU[] = [
     category: "Personal Care & Hygiene",
     gtin: "8901396001005",
     mrp: 240,
-    imageUrl: "https://images.unsplash.com/photo-1607006482602-76ca97ac4759?auto=format&fit=crop&w=400&q=80",
+    imageUrl: "/products/dettol_soap.jpg",
     description: "Trusted germ protection soap formula for daily hygiene.",
     platforms: [
       { platform: "ondc", price: 192, mrp: 240, inStock: true, deliveryMins: 15, sellerId: "ondc_dettol_4p" },
@@ -280,7 +280,7 @@ export const CANONICAL_CATALOG: CanonicalSKU[] = [
     category: "Dairy & Breakfast",
     gtin: "8901262000010",
     mrp: 54,
-    imageUrl: "https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=400&q=80",
+    imageUrl: "/products/mother_dairy_milk.jpg",
     description: "Pasteurised toned milk with wholesome nutritional goodness.",
     platforms: [
       { platform: "ondc", price: 51, mrp: 54, inStock: true, deliveryMins: 15, sellerId: "ondc_md_milk_1l" },
