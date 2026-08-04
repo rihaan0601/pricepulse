@@ -12,6 +12,7 @@ interface SeedTemplate {
   basePrice: number;
   mrp: number;
   imageUrl: string;
+  ean?: string;
 }
 
 const SEED_TEMPLATES: SeedTemplate[] = [
@@ -87,43 +88,17 @@ const SEED_TEMPLATES: SeedTemplate[] = [
   { name: "Lizol Floral Floor Cleaner", brand: "Lizol", category: "Household Essentials", subCategory: "Cleaning", weight: "500 ml", basePrice: 95, mrp: 125, imageUrl: "https://images.unsplash.com/photo-1585830810419-7ac6e3681498?w=400&auto=format&fit=crop&q=80" },
 ];
 
-// Pack Variants & Multiplier Modifiers to generate 3,500+ authentic unique 4-digit SKUs
 const VARIANT_SUFFIXES = [
   { suffix: "", weightMult: 1, priceMult: 1.0 },
   { suffix: "Small Pack", weightMult: 0.5, priceMult: 0.55 },
-  { suffix: "Mini Saver", weightMult: 0.25, priceMult: 0.30 },
   { suffix: "Economy Pack", weightMult: 1.5, priceMult: 1.40 },
   { suffix: "Family Saver Pack", weightMult: 2.0, priceMult: 1.80 },
-  { suffix: "Mega Value Box", weightMult: 4.0, priceMult: 3.50 },
   { suffix: "Pack of 2 (Super Saver)", weightMult: 2.0, priceMult: 1.85 },
   { suffix: "Pack of 3 (Combo)", weightMult: 3.0, priceMult: 2.70 },
-  { suffix: "Pack of 4 (Value Bundle)", weightMult: 4.0, priceMult: 3.40 },
   { suffix: "Pack of 6 (Bulk Family)", weightMult: 6.0, priceMult: 5.00 },
   { suffix: "Twin Pack", weightMult: 2.0, priceMult: 1.82 },
   { suffix: "Buy 1 Get 1 Special", weightMult: 2.0, priceMult: 1.60 },
   { suffix: "Extra 20% Free Edition", weightMult: 1.2, priceMult: 1.05 },
-  { suffix: "Organic Select", weightMult: 1.0, priceMult: 1.25 },
-  { suffix: "Gold Quality Edition", weightMult: 1.0, priceMult: 1.30 },
-  { suffix: "Refill Pouch", weightMult: 1.0, priceMult: 0.90 },
-  { suffix: "Travel Mini", weightMult: 0.2, priceMult: 0.28 },
-  { suffix: "Festival Gift Edition", weightMult: 1.5, priceMult: 1.60 },
-  { suffix: "Zero Sugar / Lite Variant", weightMult: 1.0, priceMult: 1.10 },
-  { suffix: "Classic Original", weightMult: 1.0, priceMult: 1.00 },
-  { suffix: "Spicy / Masala Burst", weightMult: 1.0, priceMult: 1.05 },
-  { suffix: "Extra Fresh Edition", weightMult: 1.0, priceMult: 1.08 },
-  { suffix: "High Fiber / Whole Grain", weightMult: 1.0, priceMult: 1.15 },
-  { suffix: "Zero Preservatives Natural", weightMult: 1.0, priceMult: 1.20 },
-  { suffix: "Super Saver Bucket", weightMult: 5.0, priceMult: 4.20 },
-  { suffix: "Pocket Size Pack", weightMult: 0.15, priceMult: 0.22 },
-  { suffix: "Institutional Bulk Pack", weightMult: 10.0, priceMult: 8.50 },
-  { suffix: "Limited Gold Series", weightMult: 1.0, priceMult: 1.40 },
-  { suffix: "Extra Value Promo Pack", weightMult: 1.3, priceMult: 1.10 },
-  { suffix: "Eco-Friendly Box", weightMult: 1.0, priceMult: 1.02 },
-  { suffix: "Duo Combo Pack", weightMult: 2.0, priceMult: 1.88 },
-  { suffix: "Triple Delight Pack", weightMult: 3.0, priceMult: 2.75 },
-  { suffix: "Bumper Savings Box", weightMult: 4.0, priceMult: 3.45 },
-  { suffix: "Fresh Harvest Choice", weightMult: 1.0, priceMult: 1.12 },
-  { suffix: "Premium Artisanal Reserve", weightMult: 1.0, priceMult: 1.50 },
 ];
 
 export function generateFullCatalog(): Product[] {
@@ -183,11 +158,12 @@ export function generateFullCatalog(): Product[] {
 
       catalog.push({
         id,
+        ean: tmpl.ean || `890${globalCount.toString().padStart(10, '0')}`,
         name: variantName,
         brand: tmpl.brand,
         category: tmpl.category,
         subCategory: tmpl.subCategory,
-        imageUrl: getRealisticProductImage(variantName, tmpl.brand, tmpl.category),
+        imageUrl: tmpl.imageUrl,
         weight: weight,
         platforms,
       });

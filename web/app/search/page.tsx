@@ -40,6 +40,48 @@ const PLATFORM_EMOJIS: Record<string, string> = {
 // Track live price deltas: productId → platform → pct delta
 type PriceDeltaMap = Record<string, Record<string, { price: number; delta: 'up' | 'down' | 'same' }>>;
 
+function ImageWithFallback({ src, ean, alt, className }: { src: string; ean?: string; alt: string; className: string }) {
+  const [imgSrc, setImgSrc] = useState(src);
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    setImgSrc(src);
+    setHasError(false);
+  }, [src]);
+
+  const handleError = async () => {
+    if (hasError) return;
+    setHasError(true);
+    if (ean) {
+      try {
+        const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${ean}.json`);
+        if (res.ok) {
+          const data = await res.json();
+          const fallbackUrl = data?.product?.image_front_url || data?.product?.selected_images?.front?.display?.in;
+          if (fallbackUrl) {
+            setImgSrc(fallbackUrl);
+            return;
+          }
+        }
+      } catch (err) {
+        console.error('Fallback fetch failed', err);
+      }
+    }
+    // Final generic placeholder if OFF also fails
+    setImgSrc(`https://ui-avatars.com/api/?name=${encodeURIComponent(alt)}&background=random&size=400`);
+  };
+
+  return (
+    <img
+      src={imgSrc || `https://ui-avatars.com/api/?name=${encodeURIComponent(alt)}&background=random&size=400`}
+      alt={alt}
+      className={className}
+      loading="lazy"
+      onError={handleError}
+    />
+  );
+}
+
 export default function SearchPage() {
   const router = useRouter();
   const { location, cart, addToCart, updateQuantity, getCartCount } = useCartStore();
@@ -347,11 +389,11 @@ export default function SearchPage() {
 
                       {/* Product Image */}
                       <div className="relative w-full h-44 mb-3 bg-secondary/30 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-[1.02] transition-transform duration-300">
-                        <img
-                          src={getRealisticProductImage(product.title, product.brand, product.category)}
+                        <ImageWithFallback
+                          src={product.imageUrl || ''}
+                          ean={product.ean}
                           alt={product.title}
                           className="w-full h-full object-cover rounded-xl"
-                          loading="lazy"
                         />
                         {/* Pack Quantity / Weight Badge */}
                         <span className="absolute top-2 right-2 text-[10px] font-black text-white bg-indigo-600/90 backdrop-blur-md px-2 py-0.5 rounded-lg border border-indigo-400/30 shadow-md">

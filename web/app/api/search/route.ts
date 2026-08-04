@@ -17,6 +17,7 @@ export async function GET(request: Request) {
     // Transform catalog schema -> frontend CartProduct schema
     const results = rawResults.map(product => ({
       id: product.id,
+      ean: product.ean,
       title: product.name,
       brand: product.brand,
       unit: product.weight,

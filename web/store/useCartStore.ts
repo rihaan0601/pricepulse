@@ -17,6 +17,7 @@ export interface CartProduct {
   brand: string;
   unit: string;
   category: string;
+  ean?: string;
   gtin?: string;
   mrp?: number;
   imageUrl?: string;

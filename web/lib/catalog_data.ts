@@ -11,6 +11,7 @@ export interface PlatformDetails {
 
 export interface Product {
   id: string;
+  ean: string;
   name: string;
   brand: string;
   category: string;
