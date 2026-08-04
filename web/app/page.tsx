@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import { 
   Search, Mic, MapPin, Zap, ShoppingCart, Sparkles, Filter, Check, 
   Award, Bell, Share2, ExternalLink, ShieldCheck, ArrowRight, RefreshCw,
-  Plus, Minus, Trash2, Cpu, Copy, CheckCircle2, AlertTriangle, Layers, Split, Clock
+  Plus, Minus, Trash2, Cpu, Copy, CheckCircle2, AlertTriangle, Layers, Split, Clock,
+  ChevronDown, Heart, Baby, Headphones, Gift, Tag, Percent, ThumbsUp, X
 } from 'lucide-react';
 import { useCartStore, LOCATION_PRESETS } from '@/store/useCartStore';
 import { useGamificationStore } from '@/store/useGamificationStore';
@@ -17,73 +18,229 @@ import PlatformOfferBadge from '@/app/components/PlatformOfferBadge';
 import { VENDORS, CANONICAL_CATALOG, PlatformId, CanonicalSKU } from '@/lib/vendorsAndCatalog';
 import { runCombinatorialOptimizer, generateONDCBecknPayload, generateAmazonMultiASINLink, simulateCartInjector, APPLIED_COUPONS } from '@/lib/cartOptimizer';
 
-export default function HighDensityMasterApp() {
+// Real items matching the exact photos
+const PHOTO_DEALS = [
+  {
+    id: "d1",
+    discount: "9% OFF",
+    brandTag: "AMUL • 500G",
+    title: "Amul Pasteurised Butter",
+    platformTag: "ONDC NETWORK",
+    price: 260,
+    mrp: 285,
+    imageUrl: "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=400&q=80",
+    catalogId: "sku-001"
+  },
+  {
+    id: "d2",
+    discount: "19% OFF",
+    brandTag: "AASHIRVAAD • 5KG",
+    title: "Aashirvaad Superior MP Sharbati Whole Wheat Atta",
+    platformTag: "ONDC NETWORK",
+    price: 275,
+    mrp: 340,
+    imageUrl: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=400&q=80",
+    catalogId: "sku-002"
+  },
+  {
+    id: "d3",
+    discount: "26% OFF",
+    brandTag: "FORTUNE • 1L POUCH",
+    title: "Fortune Sunlite Refined Sunflower Oil",
+    platformTag: "ONDC NETWORK",
+    price: 122,
+    mrp: 165,
+    imageUrl: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=400&q=80",
+    catalogId: "sku-004"
+  },
+  {
+    id: "d4",
+    discount: "7% OFF",
+    brandTag: "MOTHER DAIRY • 1L POLY PACK",
+    title: "Mother Dairy Toned Milk",
+    platformTag: "ONDC NETWORK",
+    price: 52,
+    mrp: 56,
+    imageUrl: "https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=400&q=80",
+    catalogId: "sku-008"
+  },
+  {
+    id: "d5",
+    discount: "25% OFF",
+    brandTag: "TATA TEA • 500G PACK",
+    title: "Tata Tea Gold Premium Black Tea",
+    platformTag: "ONDC NETWORK",
+    price: 280,
+    mrp: 375,
+    imageUrl: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=400&q=80",
+    catalogId: "sku-003"
+  },
+  {
+    id: "d6",
+    discount: "18% OFF",
+    brandTag: "NESCAFÉ • 100G GLASS JAR",
+    title: "Nescafe Classic Instant Coffee Powder",
+    platformTag: "ONDC NETWORK",
+    price: 315,
+    mrp: 385,
+    imageUrl: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=400&q=80",
+    catalogId: "sku-006"
+  }
+];
+
+const PHOTO_COMPARISONS = [
+  {
+    id: "c1",
+    brand: "FORTUNE",
+    gtin: "8906007280014",
+    title: "Fortune Sunlite Refined Sunflower Oil",
+    unitTag: "1L Pouch",
+    description: "Light and clear edible sunflower oil rich in Vitamin E for healthy cooking.",
+    imageUrl: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=400&q=80",
+    bestDealPrice: 122,
+    bestDealPlatform: "ONDC Network",
+    savingsVsMRP: 43,
+    mrp: 165,
+    matrix: [
+      { name: "Zepto", price: 135, sla: "7m", mrp: 165 },
+      { name: "Blinkit", price: 128, sla: "8m", mrp: 165 },
+      { name: "Swiggy Instamart", price: 139, sla: "12m", mrp: 165 },
+      { name: "Flipkart Minutes", price: 129, sla: "11m", mrp: 165 },
+      { name: "Amazon Fresh", price: 125, sla: "60m", mrp: 165 },
+      { name: "ONDC Network", price: 122, sla: "15m", mrp: 165, isWinner: true },
+    ],
+    catalogItem: CANONICAL_CATALOG[3]
+  },
+  {
+    id: "c2",
+    brand: "CADBURY",
+    gtin: "8901233001002",
+    title: "Cadbury Dairy Milk Silk Chocolate",
+    unitTag: "150g Bar",
+    description: "Rich, smooth and creamy chocolate made from fine cocoa beans.",
+    imageUrl: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=400&q=80",
+    bestDealPrice: 148,
+    bestDealPlatform: "ONDC Network",
+    savingsVsMRP: 37,
+    mrp: 185,
+    matrix: [
+      { name: "Zepto", price: 160, sla: "7m", mrp: 185 },
+      { name: "Blinkit", price: 155, sla: "8m", mrp: 185 },
+      { name: "Swiggy Instamart", price: 162, sla: "12m", mrp: 185 },
+      { name: "Flipkart Minutes", price: 152, sla: "11m", mrp: 185 },
+      { name: "Amazon Fresh", price: 150, sla: "60m", mrp: 185 },
+      { name: "ONDC Network", price: 148, sla: "15m", mrp: 185, isWinner: true },
+    ],
+    catalogItem: CANONICAL_CATALOG[0]
+  },
+  {
+    id: "c3",
+    brand: "NESTLÉ",
+    gtin: "8901058852312",
+    title: "Maggi 2-Minute Masala Instant Noodles",
+    unitTag: "12 Packs (840g)",
+    description: "Iconic 2-minute instant noodles enriched with roasted spices and goodness of wheat.",
+    imageUrl: "https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?auto=format&fit=crop&w=400&q=80",
+    bestDealPrice: 155,
+    bestDealPlatform: "ONDC Network",
+    savingsVsMRP: 25,
+    mrp: 180,
+    matrix: [
+      { name: "Zepto", price: 165, sla: "7m", mrp: 180 },
+      { name: "Blinkit", price: 160, sla: "8m", mrp: 180 },
+      { name: "Swiggy Instamart", price: 168, sla: "12m", mrp: 180 },
+      { name: "Flipkart Minutes", price: 158, sla: "11m", mrp: 180 },
+      { name: "Amazon Fresh", price: 156, sla: "60m", mrp: 180 },
+      { name: "ONDC Network", price: 155, sla: "15m", mrp: 180, isWinner: true },
+    ],
+    catalogItem: CANONICAL_CATALOG[4]
+  },
+  {
+    id: "c4",
+    brand: "DETTOL",
+    gtin: "8901396112003",
+    title: "Dettol Original Germ Protection Bathing Soap",
+    unitTag: "125g (Pack of 4)",
+    description: "Provides 100% better germ protection compared to ordinary soaps.",
+    imageUrl: "https://images.unsplash.com/photo-1607006482602-76ca97ac4759?auto=format&fit=crop&w=400&q=80",
+    bestDealPrice: 175,
+    bestDealPlatform: "ONDC Network",
+    savingsVsMRP: 65,
+    mrp: 240,
+    matrix: [
+      { name: "Zepto", price: 195, sla: "7m", mrp: 240 },
+      { name: "Blinkit", price: 188, sla: "8m", mrp: 240 },
+      { name: "Swiggy Instamart", price: 198, sla: "12m", mrp: 240 },
+      { name: "Flipkart Minutes", price: 185, sla: "11m", mrp: 240 },
+      { name: "Amazon Fresh", price: 180, sla: "60m", mrp: 240 },
+      { name: "ONDC Network", price: 175, sla: "15m", mrp: 240, isWinner: true },
+    ],
+    catalogItem: CANONICAL_CATALOG[6]
+  }
+];
+
+export default function ExactMatchMasterApp() {
   const { toast } = useToast();
   const { location, selectLocationPreset, cart, addToCart, removeFromCart, updateQuantity, clearCart } = useCartStore();
   const { recordCartOptimization } = useGamificationStore();
   const { addSavings } = useAnalyticsStore();
 
+  const [activeTab, setActiveTab] = useState<'feed' | 'compare' | 'alerts'>('feed');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedStrategy, setSelectedStrategy] = useState<'single' | 'split2' | 'split3' | 'fastest'>('split2');
   const [isListening, setIsListening] = useState(false);
-  const [alertModalProduct, setAlertModalProduct] = useState<CanonicalSKU | null>(null);
-  const [targetPrice, setTargetPrice] = useState<number>(0);
-  const [activeTabMobile, setActiveTabMobile] = useState<'compare' | 'cart' | 'radar' | 'profile'>('compare');
+  const [showSmartCartDrawer, setShowSmartCartDrawer] = useState(false);
+
+  // Price Drop Alerts State matching Photo 1
+  const [alerts, setAlerts] = useState([
+    {
+      id: "a1",
+      title: "Amul Pasteurised Butter (500g)",
+      date: "2026-07-25",
+      platform: "ONDC Network",
+      currentBest: 260,
+      targetAlert: 250,
+      imageUrl: "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=400&q=80"
+    },
+    {
+      id: "a2",
+      title: "boAt Airdopes 141 True Wireless Earbuds",
+      date: "2026-07-28",
+      platform: "ONDC Network",
+      currentBest: 999,
+      targetAlert: 899,
+      imageUrl: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=400&q=80"
+    }
+  ]);
+
+  const [newMonitorModal, setNewMonitorModal] = useState(false);
   const [ondcPayloadModal, setOndcPayloadModal] = useState<string | null>(null);
   const [injectorLogsModal, setInjectorLogsModal] = useState<string[] | null>(null);
 
-  // Web Speech API Dictation
+  // Speech Recognition
   const handleVoiceSearch = () => {
     if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-      toast.error('Speech recognition not supported in this browser environment.');
+      toast.error('Voice dictation not supported in this browser.');
       return;
     }
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
     recognition.lang = 'en-IN';
-    recognition.continuous = false;
-    recognition.interimResults = false;
-
-    recognition.onstart = () => {
-      setIsListening(true);
-      toast.info('Listening for spoken grocery query...');
-    };
-
-    recognition.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript;
-      setSearchQuery(transcript);
-      setIsListening(false);
-      toast.success(`Voice input recognized: "${transcript}"`);
-    };
-
-    recognition.onerror = () => {
-      setIsListening(false);
-      toast.error('Voice dictation failed. Try typing.');
-    };
-
-    recognition.onend = () => setIsListening(false);
     recognition.start();
+    setIsListening(true);
+    toast.info('Listening... Speak now');
+
+    recognition.onresult = (e: any) => {
+      const text = e.results[0][0].transcript;
+      setSearchQuery(text);
+      setIsListening(false);
+      toast.success(`Recognized: "${text}"`);
+    };
+    recognition.onerror = () => setIsListening(false);
   };
 
-  // Filter Products
-  const filteredProducts = CANONICAL_CATALOG.filter((p) => {
-    const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          p.brand.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
-
-  // Calculate Best Price per item
-  const getBestVendor = (product: CanonicalSKU) => {
-    const sorted = [...product.platforms].sort((a, b) => a.price - b.price);
-    const winner = sorted[0];
-    const savings = product.mrp - winner.price;
-    const discountPct = Math.round((savings / product.mrp) * 100);
-    return { winner, savings, discountPct };
-  };
-
-  // Cart Combinatorial Optimization
+  // Cart Optimizer Logic
   const cartInputItems = cart.map((item) => {
     const catalogSKU = CANONICAL_CATALOG.find((sku) => sku.id === item.product.id) || {
       id: item.product.id,
@@ -109,582 +266,685 @@ export default function HighDensityMasterApp() {
 
   const optimizationResult = runCombinatorialOptimizer(cartInputItems, selectedStrategy);
 
-  // Trigger Checkout Handoffs
   const handleTriggerCheckout = (mode: 'ondc' | 'amazon' | 'injector') => {
     if (!optimizationResult || cart.length === 0) {
       toast.error('Your cart is empty!');
       return;
     }
 
-    addSavings(optimizationResult.totalNetSavings, 'PricePulse Combinatorial Engine');
+    addSavings(optimizationResult.totalNetSavings, 'PricePulse Engine');
     recordCartOptimization(optimizationResult.totalNetSavings);
 
     if (mode === 'ondc') {
       const payloadStr = generateONDCBecknPayload(optimizationResult.vendorSplits, location.pincode);
       setOndcPayloadModal(payloadStr);
-      toast.success('ONDC Beckn Protocol Payload Generated!');
+      toast.success('ONDC Beckn Payload Generated!');
     } else if (mode === 'amazon') {
       const link = generateAmazonMultiASINLink(optimizationResult.vendorSplits);
       window.open(link, '_blank');
-      toast.success('Launching Amazon Multi-ASIN Cart Link...');
+      toast.success('Opening Amazon Multi-ASIN Cart Link...');
     } else if (mode === 'injector') {
       const firstSplit = optimizationResult.vendorSplits[0];
       if (firstSplit) {
         const logs = simulateCartInjector(firstSplit);
         setInjectorLogsModal(logs);
-        toast.success('Cart Injector Script Executed! Halting safely at RBI 2FA Payment Gate.');
+        toast.success('Cart Injector Script Executed! Halting safely at 2FA Payment Gate.');
       }
     }
   };
 
+  const removeAlert = (id: string) => {
+    setAlerts(alerts.filter(a => a.id !== id));
+    toast.success('Price drop monitor removed.');
+  };
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased pb-20 lg:pb-6">
+    <div className="min-h-screen bg-slate-100 text-slate-800 font-sans antialiased pb-24">
       
-      {/* 1. HIGH DENSITY HEADER */}
-      <header className="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-3 py-2">
-        <div className="max-w-[1700px] mx-auto flex items-center justify-between gap-3">
+      {/* ===================================================================== */}
+      {/* HEADER BAR (EXACT DESIGN MATCH FROM ALL 4 PHOTOS)                      */}
+      {/* ===================================================================== */}
+      <header className="sticky top-0 z-40 bg-white border-b border-slate-200 px-4 py-2.5 shadow-sm">
+        <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-4">
           
-          {/* Logo */}
-          <div className="flex items-center space-x-2 shrink-0">
-            <div className="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center font-black text-white text-sm tracking-tighter shadow-lg shadow-indigo-600/30">
-              PP
+          {/* Logo & Location */}
+          <div className="flex items-center space-x-3 shrink-0">
+            <div className="flex items-center space-x-1.5">
+              <div className="bg-indigo-600 text-white font-black text-xs px-2 py-1.5 rounded-lg flex items-center gap-1 shadow-sm">
+                <Zap className="w-3.5 h-3.5 fill-current" />
+                <span>PP</span>
+              </div>
+              <div>
+                <span className="font-black text-slate-900 text-sm tracking-tight block leading-none">PRICEPULSE</span>
+                <span className="text-[9px] font-bold text-indigo-600 tracking-wider">AI ENGINE</span>
+              </div>
             </div>
-            <div>
-              <span className="text-base font-black tracking-tight text-white flex items-center gap-1">
-                PRICE<span className="text-indigo-500">PULSE</span>
-              </span>
-              <span className="block text-[9px] font-bold text-slate-400 -mt-1 tracking-widest uppercase">Quick-Commerce AI</span>
+
+            {/* Pincode Location Button */}
+            <div className="relative">
+              <select
+                value={location.pincode}
+                onChange={(e) => selectLocationPreset(e.target.value)}
+                className="bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-bold text-xs rounded-full px-3 py-1 outline-none cursor-pointer flex items-center appearance-none pr-6"
+              >
+                {LOCATION_PRESETS.map((preset) => (
+                  <option key={preset.pincode} value={preset.pincode}>
+                    📍 {preset.name} ({preset.pincode})
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="w-3 h-3 text-slate-500 absolute right-2 top-2 pointer-events-none" />
             </div>
           </div>
 
-          {/* Location Pincode Selector */}
-          <div className="hidden sm:flex items-center bg-slate-800/80 border border-slate-700/80 rounded-xl px-2.5 py-1 text-xs">
-            <MapPin className="w-3.5 h-3.5 text-indigo-400 mr-1.5 shrink-0" />
-            <span className="text-slate-300 font-semibold mr-1 text-[11px]">{location.area} ({location.pincode}):</span>
-            <select
-              value={location.pincode}
-              onChange={(e) => selectLocationPreset(e.target.value)}
-              className="bg-transparent text-indigo-400 font-bold outline-none cursor-pointer text-xs"
-            >
-              {LOCATION_PRESETS.map((preset) => (
-                <option key={preset.pincode} value={preset.pincode} className="bg-slate-900 text-slate-100">
-                  {preset.name} ({preset.pincode})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Search Input & Dictation */}
-          <div className="flex-1 max-w-xl relative">
-            <div className="relative flex items-center">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none" />
-              <input
-                type="text"
-                placeholder='Search 1,250+ SKUs (e.g. "Find 500g butter and 5kg Atta under ₹400")'
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-10 py-1.5 text-xs bg-slate-800/60 border border-slate-700/80 rounded-xl text-slate-100 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
-              />
+          {/* Center Nav Capsule Tabs */}
+          <div className="hidden md:flex items-center bg-slate-200/80 p-1 rounded-full text-xs font-black">
+            {[
+              { id: 'feed', label: 'FEED' },
+              { id: 'compare', label: 'COMPARE' },
+              { id: 'alerts', label: 'ALERTS' },
+            ].map((tab) => (
               <button
-                onClick={handleVoiceSearch}
-                title="Voice Grocery List Dictation"
-                className={`absolute right-2 p-1 rounded-lg transition-colors ${
-                  isListening ? 'bg-rose-500 text-white animate-pulse' : 'text-slate-400 hover:text-indigo-400'
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`px-5 py-1 rounded-full transition-all tracking-wider ${
+                  activeTab === tab.id
+                    ? 'bg-indigo-600 text-white shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                <Mic className="w-3.5 h-3.5" />
+                {tab.label}
               </button>
-            </div>
+            ))}
           </div>
 
-          {/* XP Bar & Basket */}
+          {/* Right Controls: Cart & Profile */}
           <div className="flex items-center space-x-3 shrink-0">
-            <div className="hidden lg:block w-44">
-              <XPProgressBar />
-            </div>
-
             <button
-              onClick={() => setActiveTabMobile('cart')}
-              className="relative p-2 bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 rounded-xl text-indigo-300 font-semibold text-xs flex items-center gap-1.5 transition"
+              onClick={() => setShowSmartCartDrawer(true)}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-1.5 rounded-full text-xs font-bold shadow-md shadow-indigo-600/20 flex items-center gap-2 transition"
             >
-              <ShoppingCart className="w-4 h-4" />
-              <span className="hidden md:inline font-bold">Basket</span>
-              {cart.length > 0 && (
-                <span className="bg-indigo-600 text-white text-[10px] font-black rounded-full px-1.5 py-0.2">
-                  {cart.reduce((a, b) => a + b.quantity, 0)}
-                </span>
-              )}
+              <ShoppingCart className="w-3.5 h-3.5" />
+              <span>SMART CART</span>
+              <span className="bg-white text-indigo-700 text-[10px] font-black rounded-full px-1.5 py-0.2">
+                {cart.reduce((a, b) => a + b.quantity, 0)}
+              </span>
             </button>
+
+            {/* Profile Avatar Pill */}
+            <div className="flex items-center space-x-1.5 bg-slate-100 border border-slate-300 rounded-full px-2 py-1">
+              <img 
+                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" 
+                alt="User" 
+                className="w-5 h-5 rounded-full object-cover"
+              />
+              <span className="text-xs font-bold text-slate-800">Rahul</span>
+              <span className="bg-amber-100 border border-amber-300 text-amber-800 text-[9px] font-black px-1.5 rounded-full">
+                Lv.3
+              </span>
+            </div>
           </div>
         </div>
       </header>
 
-      {/* QUICK PROMPT PILLS */}
-      <div className="bg-slate-900/50 border-b border-slate-800 px-3 py-1.5 overflow-x-auto no-scrollbar">
-        <div className="max-w-[1700px] mx-auto flex items-center space-x-2 text-[11px]">
-          <span className="text-slate-400 font-semibold uppercase tracking-wider text-[10px] shrink-0">Popular Prompts:</span>
-          {[
-            { label: '🧈 Amul Butter 500g', q: 'Amul Butter' },
-            { label: '🌾 Aashirvaad Atta 5kg', q: 'Aashirvaad Atta' },
-            { label: '🥛 Mother Dairy Milk 1L', q: 'Mother Dairy Milk' },
-            { label: '☕ Tata Tea Gold', q: 'Tata Tea' },
-            { label: '🍜 Maggi Masala 12P', q: 'Maggi' },
-            { label: '🧼 Dettol Soap 4-Pack', q: 'Dettol Soap' },
-          ].map((pill) => (
-            <button
-              key={pill.q}
-              onClick={() => setSearchQuery(pill.q)}
-              className="shrink-0 px-2.5 py-0.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 font-medium transition"
-            >
-              {pill.label}
-            </button>
-          ))}
-        </div>
+      {/* MOBILE TABS (IF SMALL SCREEN) */}
+      <div className="md:hidden flex justify-center bg-slate-200 p-1 border-b border-slate-300 text-xs font-black">
+        {['feed', 'compare', 'alerts'].map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab as any)}
+            className={`flex-1 py-1.5 rounded-full uppercase tracking-wider ${
+              activeTab === tab ? 'bg-indigo-600 text-white' : 'text-slate-700'
+            }`}
+          >
+            {tab}
+          </button>
+        ))}
       </div>
 
-      {/* 2. 3-COLUMN DESKTOP LAYOUT */}
-      <main className="max-w-[1700px] mx-auto p-3 grid grid-cols-1 lg:grid-cols-12 gap-3">
+      <main className="max-w-[1600px] mx-auto px-4 py-4 space-y-6">
 
         {/* =================================================================== */}
-        {/* LEFT COLUMN: CATALOG COMPARISON FEED (5 COLS)                       */}
+        {/* TAB 1: FEED VIEW (EXACT MATCH FOR PHOTO 3 & PHOTO 4)               */}
         {/* =================================================================== */}
-        <section className={`lg:col-span-5 space-y-3 ${activeTabMobile === 'compare' ? 'block' : 'hidden lg:block'}`}>
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-2.5 flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <span className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1">
-                <Layers className="w-3.5 h-3.5 text-indigo-400" /> Catalog Feed (1,250 SKUs)
-              </span>
-              <span className="bg-indigo-500/20 text-indigo-400 text-[10px] font-bold px-2 py-0.5 rounded-md">
-                {filteredProducts.length} Live
-              </span>
-            </div>
-
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="bg-slate-800 border border-slate-700 text-slate-300 text-xs rounded-lg px-2 py-1 outline-none font-medium cursor-pointer"
-            >
-              <option value="All">All Categories</option>
-              <option value="Dairy & Breakfast">Dairy & Breakfast</option>
-              <option value="Staples & Atta">Staples & Atta</option>
-              <option value="Snacks & Munchies">Snacks & Munchies</option>
-              <option value="Beverages & Drinks">Beverages & Drinks</option>
-              <option value="Personal Care & Hygiene">Personal Care</option>
-            </select>
-          </div>
-
-          {/* Product Feed Cards */}
-          <div className="space-y-3 max-h-[calc(100vh-180px)] overflow-y-auto pr-1 no-scrollbar">
-            {filteredProducts.map((product) => {
-              const { winner, savings, discountPct } = getBestVendor(product);
-              return (
-                <div 
-                  key={product.id}
-                  className="bg-slate-900/90 border border-slate-800 hover:border-indigo-500/50 rounded-xl p-3 space-y-2.5 transition-all shadow-md"
-                >
-                  <div className="flex items-start space-x-3">
-                    <img 
-                      src={product.imageUrl} 
-                      alt={product.title} 
-                      className="w-16 h-16 object-cover rounded-lg border border-slate-800 shrink-0 bg-slate-800"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wide">{product.brand}</span>
-                        <span className="bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] font-black px-1.5 py-0.2 rounded">
-                          -{discountPct}% OFF
-                        </span>
-                      </div>
-                      <h3 className="text-xs font-bold text-slate-100 truncate">{product.title}</h3>
-                      <div className="flex items-center space-x-2 text-[10px] text-slate-400 mt-0.5">
-                        <span>{product.unit}</span>
-                        <span>•</span>
-                        <span className="font-mono text-slate-500">GTIN: {product.gtin}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 6-VENDOR PRICE COMPARISON MATRIX */}
-                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-1 bg-slate-950 p-1.5 rounded-lg border border-slate-800/80">
-                    {product.platforms.map((p) => {
-                      const v = VENDORS[p.platform as PlatformId];
-                      const isWinner = p.platform === winner.platform;
-                      return (
-                        <div 
-                          key={p.platform}
-                          className={`p-1 rounded text-center border transition-all ${
-                            isWinner 
-                              ? 'bg-emerald-500/15 border-emerald-500/50 ring-1 ring-emerald-500/30' 
-                              : 'bg-slate-900/60 border-slate-800'
-                          }`}
-                        >
-                          <div className="text-[9px] font-semibold text-slate-400 truncate flex items-center justify-center gap-0.5">
-                            <span>{v?.logoEmoji || '🛒'}</span>
-                            <span className="truncate">{v?.shortName || p.platform}</span>
-                          </div>
-                          <div className={`text-xs font-black mt-0.5 ${isWinner ? 'text-emerald-400' : 'text-slate-200'}`}>
-                            ₹{p.price}
-                          </div>
-                          <div className="text-[8px] text-slate-400">{p.deliveryMins}m</div>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Winner Summary & Action Buttons */}
-                  <div className="flex items-center justify-between pt-1">
-                    <div className="flex items-center space-x-1.5">
-                      <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-black px-2 py-0.5 rounded flex items-center gap-1">
-                        👑 Lowest: ₹{winner.price} on {VENDORS[winner.platform as PlatformId]?.shortName}
-                      </span>
-                      <span className="text-[10px] text-slate-400 line-through">₹{product.mrp}</span>
-                    </div>
-
-                    <div className="flex items-center space-x-1.5">
-                      <button
-                        onClick={() => {
-                          setAlertModalProduct(product);
-                          setTargetPrice(winner.price - 10);
-                        }}
-                        title="Set Price Alert Monitor"
-                        className="p-1.5 bg-slate-800 hover:bg-amber-500/20 text-slate-400 hover:text-amber-400 border border-slate-700 rounded-lg transition"
-                      >
-                        <Bell className="w-3.5 h-3.5" />
-                      </button>
-
-                      <button
-                        onClick={() => addToCart(product as any)}
-                        className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg shadow-sm flex items-center gap-1 transition"
-                      >
-                        <Plus className="w-3.5 h-3.5" /> Add
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* =================================================================== */}
-        {/* CENTER COLUMN: SMART CART PARTITIONING ENGINE (4 COLS)              */}
-        {/* =================================================================== */}
-        <section className={`lg:col-span-4 space-y-3 ${activeTabMobile === 'cart' ? 'block' : 'hidden lg:block'}`}>
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-3">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xs font-black uppercase tracking-wider text-slate-200 flex items-center gap-1.5">
-                <Split className="w-4 h-4 text-indigo-400" /> Smart Cart Partitioning Engine
-              </h2>
-              {cart.length > 0 && (
-                <button 
-                  onClick={clearCart}
-                  className="text-[10px] font-semibold text-rose-400 hover:underline flex items-center gap-0.5"
-                >
-                  <Trash2 className="w-3 h-3" /> Clear
-                </button>
-              )}
-            </div>
-
-            {/* 4 Strategy Tabs */}
-            <div className="grid grid-cols-4 gap-1 p-1 bg-slate-950 rounded-xl border border-slate-800 text-[10px] font-bold">
-              {[
-                { id: 'single', label: '🏆 Single' },
-                { id: 'split2', label: '🔀 2-Split' },
-                { id: 'split3', label: '⚡ 3-Split' },
-                { id: 'fastest', label: '⏱ SLA' },
-              ].map((strat) => (
-                <button
-                  key={strat.id}
-                  onClick={() => setSelectedStrategy(strat.id as any)}
-                  className={`py-1.5 rounded-lg text-center transition ${
-                    selectedStrategy === strat.id 
-                      ? 'bg-indigo-600 text-white shadow-sm font-black' 
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  {strat.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Cart Items List */}
-            {cart.length === 0 ? (
-              <div className="py-8 text-center space-y-2 border border-dashed border-slate-800 rounded-xl">
-                <ShoppingCart className="w-8 h-8 text-slate-600 mx-auto" />
-                <p className="text-xs font-semibold text-slate-400">Your basket is empty</p>
-                <p className="text-[10px] text-slate-500">Add products from the catalog feed to compare split savings</p>
+        {activeTab === 'feed' && (
+          <div className="space-y-6">
+            
+            {/* HERO GREEN BANNER CARD (PHOTO 4) */}
+            <div className="bg-[#0f3d38] text-white rounded-[28px] p-6 shadow-xl relative overflow-hidden space-y-4 border border-emerald-900">
+              <div className="inline-flex items-center space-x-1.5 bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-bold px-3 py-1 rounded-full">
+                <Zap className="w-3.5 h-3.5" />
+                <span>AI Quick-Commerce Price Engine for India</span>
               </div>
-            ) : (
-              <div className="space-y-2 max-h-52 overflow-y-auto pr-1 no-scrollbar">
-                {cart.map((item) => (
-                  <div key={item.product.id} className="bg-slate-950 p-2 rounded-lg border border-slate-800 flex items-center justify-between text-xs">
-                    <div className="flex-1 min-w-0 pr-2">
-                      <div className="font-bold text-slate-200 truncate">{item.product.title}</div>
-                      <div className="text-[10px] text-slate-400 flex items-center space-x-1">
-                        <span>₹{item.product.mrp} MRP</span>
-                      </div>
-                    </div>
 
-                    <div className="flex items-center space-x-1.5 shrink-0">
-                      <button
-                        onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                        className="w-5 h-5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded flex items-center justify-center font-bold"
-                      >
-                        <Minus className="w-3 h-3" />
-                      </button>
-                      <span className="font-mono font-bold text-white px-1">{item.quantity}</span>
-                      <button
-                        onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                        className="w-5 h-5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded flex items-center justify-center font-bold"
-                      >
-                        <Plus className="w-3 h-3" />
-                      </button>
-                    </div>
+              <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight max-w-2xl leading-tight">
+                Stop Overpaying on Groceries &amp; Quick Orders.
+              </h1>
+
+              <p className="text-sm text-emerald-200/90 max-w-2xl">
+                PricePulse aggregates 4,900+ real-time listings across <strong className="text-white">Blinkit, Zepto, Swiggy Instamart, Flipkart Minutes, Amazon Fresh, and ONDC</strong>.
+              </p>
+
+              {/* Natural Language Search Input */}
+              <div className="bg-white rounded-2xl p-1.5 shadow-lg flex items-center max-w-3xl">
+                <Sparkles className="w-5 h-5 text-indigo-500 ml-3 shrink-0" />
+                <input
+                  type="text"
+                  placeholder='Try "Find 500g Amul butter and 5kg Atta under ₹400"'
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full px-3 py-2 text-xs sm:text-sm text-slate-800 placeholder-slate-400 outline-none font-medium"
+                />
+                <button
+                  onClick={handleVoiceSearch}
+                  className={`p-2 rounded-xl text-slate-500 hover:text-indigo-600 transition ${isListening ? 'bg-rose-500 text-white animate-pulse' : ''}`}
+                  title="Voice Search"
+                >
+                  <Mic className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setActiveTab('compare')}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black px-5 py-2.5 rounded-xl flex items-center gap-1 shrink-0 transition"
+                >
+                  <span>SEARCH</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* Quick Prompt Tags */}
+              <div className="flex flex-wrap items-center gap-2 text-[11px] pt-1">
+                <span className="font-extrabold text-emerald-300 tracking-wider">POPULAR:</span>
+                {[
+                  { label: '🧈 AMUL BUTTER 500G', q: 'Amul Butter' },
+                  { label: '🌾 AASHIRVAAD ATTA 5KG', q: 'Aashirvaad Atta' },
+                  { label: '🥛 MOTHER DAIRY MILK', q: 'Mother Dairy Milk' },
+                  { label: '☕ TATA TEA & COFFEE', q: 'Tata Tea' },
+                  { label: '🍜 MAGGI MASALA 12P', q: 'Maggi' },
+                  { label: '🧼 DETTOL SOAPS', q: 'Dettol Soap' },
+                ].map((tag) => (
+                  <button
+                    key={tag.q}
+                    onClick={() => {
+                      setSearchQuery(tag.q);
+                      setActiveTab('compare');
+                    }}
+                    className="bg-white/10 hover:bg-white/20 border border-white/15 text-white font-semibold px-2.5 py-1 rounded-full transition"
+                  >
+                    {tag.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* DARK STORE LIVE RADAR BAR (PHOTO 4) */}
+            <div className="bg-[#121824] text-white rounded-2xl p-4 border border-slate-800 space-y-3">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></div>
+                  <h2 className="text-xs font-black uppercase tracking-wider text-slate-200">DARK STORE LIVE RADAR</h2>
+                  <span className="bg-indigo-500/20 text-indigo-300 text-[10px] font-bold px-2 py-0.5 rounded">PINCODE 560038</span>
+                </div>
+                <span className="text-xs font-mono text-emerald-400 font-bold">⏱ Ping: 12ms</span>
+              </div>
+
+              {/* 6 Platform SLA Cards */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+                {[
+                  { name: "ZEPTO", badge: "bg-purple-500/20 text-purple-300 border-purple-500/40", sla: "~7 MINS", fee: "Fee: ₹15" },
+                  { name: "BLINKIT", badge: "bg-yellow-500/20 text-yellow-300 border-yellow-500/40", sla: "~8 MINS", fee: "Fee: ₹16 + ₹15 surge" },
+                  { name: "SWIGGY INSTAMART", badge: "bg-orange-500/20 text-orange-300 border-orange-500/40", sla: "~12 MINS", fee: "Fee: ₹20" },
+                  { name: "FLIPKART MINUTES", badge: "bg-blue-500/20 text-blue-300 border-blue-500/40", sla: "~10 MINS", fee: "Fee: ₹15" },
+                  { name: "AMAZON FRESH", badge: "bg-amber-500/20 text-amber-300 border-amber-500/40", sla: "~45 MINS", fee: "Fee: ₹30" },
+                  { name: "ONDC NETWORK", badge: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40", sla: "~15 MINS", fee: "Fee: ₹10" },
+                ].map((v) => (
+                  <div key={v.name} className="bg-slate-900/90 border border-slate-800 p-2.5 rounded-xl space-y-1">
+                    <span className={`inline-block text-[9px] font-black px-1.5 py-0.5 rounded border ${v.badge}`}>
+                      {v.name}
+                    </span>
+                    <div className="text-xs font-mono font-black text-white">{v.sla}</div>
+                    <div className="text-[9px] text-slate-400">{v.fee}</div>
                   </div>
                 ))}
               </div>
-            )}
+            </div>
 
-            {/* Combinatorial Optimizer Summary */}
-            {optimizationResult && (
-              <div className="space-y-2.5 pt-2 border-t border-slate-800">
-                <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-2.5 flex items-center justify-between">
-                  <div>
-                    <span className="block text-[10px] font-bold uppercase tracking-wider text-emerald-400">Total Net Savings</span>
-                    <span className="text-lg font-black text-emerald-300">₹{optimizationResult.totalNetSavings} ({optimizationResult.savingsPercentage}%)</span>
-                  </div>
-                  <div className="text-right text-[10px] text-slate-400">
-                    <div>MRP Total: <span className="line-through">₹{optimizationResult.totalMRP}</span></div>
-                    <div>Pay: <span className="font-bold text-white">₹{optimizationResult.grandTotalCost}</span></div>
-                  </div>
+            {/* TRENDING PRICE DROPS SECTION (PHOTO 3) */}
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-2">
+                  <h2 className="text-sm font-black uppercase tracking-wider text-slate-900">🔥 TRENDING PRICE DROPS</h2>
+                  <span className="bg-rose-100 text-rose-700 text-[10px] font-extrabold px-2 py-0.5 rounded-full">LIVE DEALS</span>
                 </div>
+                <button onClick={() => setActiveTab('compare')} className="text-xs font-bold text-indigo-600 hover:underline">VIEW ALL ➔</button>
+              </div>
 
-                {/* Stackable Platform Coupon Offers */}
-                <div className="flex flex-wrap gap-1">
-                  {APPLIED_COUPONS.map((coupon) => (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                {PHOTO_DEALS.map((deal) => (
+                  <div key={deal.id} className="bg-white border border-slate-200 rounded-2xl p-2.5 space-y-2 relative shadow-sm hover:shadow-md transition">
+                    <span className="absolute top-2 left-2 bg-rose-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded-md shadow">
+                      {deal.discount}
+                    </span>
+
+                    <img src={deal.imageUrl} alt={deal.title} className="w-full h-28 object-cover rounded-xl bg-slate-100" />
+
+                    <div>
+                      <span className="text-[9px] font-black text-slate-400 block tracking-wide uppercase">{deal.brandTag}</span>
+                      <h3 className="text-xs font-bold text-slate-900 leading-snug line-clamp-2 h-8">{deal.title}</h3>
+                    </div>
+
+                    <div className="bg-emerald-50 text-emerald-800 text-[9px] font-black px-2 py-0.5 rounded border border-emerald-200 inline-block">
+                      {deal.platformTag}
+                    </div>
+
+                    <div className="flex items-baseline space-x-1.5">
+                      <span className="text-sm font-black text-slate-900">₹{deal.price}</span>
+                      <span className="text-xs text-slate-400 line-through">₹{deal.mrp}</span>
+                    </div>
+
                     <button
-                      key={coupon.code}
                       onClick={() => {
-                        navigator.clipboard.writeText(coupon.code);
-                        toast.success(`Coupon code ${coupon.code} copied to clipboard!`);
+                        const item = CANONICAL_CATALOG.find(s => s.id === deal.catalogId) || CANONICAL_CATALOG[0];
+                        addToCart(item as any);
+                        toast.success(`Added ${deal.title} to Basket!`);
                       }}
-                      title="Click to copy coupon"
+                      className="w-full py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold rounded-xl flex items-center justify-center gap-1 transition"
                     >
-                      <PlatformOfferBadge 
-                        code={coupon.code} 
-                        paymentMethod={coupon.paymentMethod} 
-                        discountLabel={`-₹${coupon.discountAmount}`} 
-                        platform={VENDORS[coupon.vendorId].shortName} 
-                      />
+                      <ShoppingCart className="w-3 h-3" />
+                      <span>ADD</span>
                     </button>
-                  ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* MASTER CATEGORY EXPLORER (PHOTO 3) */}
+            <div className="space-y-3 pt-2">
+              <div className="flex justify-between items-center">
+                <h2 className="text-sm font-black uppercase tracking-wider text-slate-900">🌐 MASTER CATEGORY EXPLORER</h2>
+                <span className="text-xs text-slate-500 font-semibold">1,250+ SKUs Aggregated</span>
+              </div>
+
+              <div className="flex items-center space-x-2 overflow-x-auto no-scrollbar py-1 text-xs font-bold">
+                {[
+                  { name: "ALL PRODUCTS", active: true },
+                  { name: "DAIRY &...", icon: "🥛" },
+                  { name: "STAPLES & ATTA", icon: "🌾" },
+                  { name: "SNACKS &...", icon: "🍿" },
+                  { name: "BEVERAGES & TEA", icon: "☕" },
+                  { name: "HOUSEHOLD &...", icon: "🧼" },
+                  { name: "PERSONAL CARE", icon: "🧴" },
+                  { name: "BABY CARE", icon: "👶" },
+                  { name: "ELECTRONICS &...", icon: "🎧" },
+                ].map((cat, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveTab('compare')}
+                    className={`shrink-0 px-4 py-2 rounded-xl border flex items-center space-x-1.5 transition ${
+                      cat.active 
+                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' 
+                        : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                    }`}
+                  >
+                    {cat.icon && <span>{cat.icon}</span>}
+                    <span>{cat.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 3 FEATURE HIGHLIGHT CARDS (PHOTO 3) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+              <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-start space-x-3 shadow-sm">
+                <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                  <CheckCircle2 className="w-5 h-5" />
                 </div>
+                <div>
+                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-wide">ONDC Direct Merchant Prices</h3>
+                  <p className="text-xs text-slate-500 mt-1">Bypass high commission markups by buying directly from neighbourhood kirana networks.</p>
+                </div>
+              </div>
 
-                {/* Itemized Savings Breakdown Bar Chart */}
-                <SavingsBreakdownChart 
-                  items={optimizationResult.itemSavingsBreakdown.map((i) => ({
-                    title: i.productTitle,
-                    savings: i.itemSavings,
-                    platform: i.winningVendor
-                  }))} 
-                />
+              <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-start space-x-3 shadow-sm">
+                <div className="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
+                  <Zap className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-wide">3-Way Combinatorial Split</h3>
+                  <p className="text-xs text-slate-500 mt-1">Our AI evaluates 10+ platform combinations to split your cart items for maximum savings.</p>
+                </div>
+              </div>
 
-                {/* Vendor Order Splits */}
-                <div className="space-y-1.5 pt-1">
-                  <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Partitioned Store Orders ({optimizationResult.vendorSplits.length}):</span>
-                  {optimizationResult.vendorSplits.map((split) => (
-                    <div key={split.vendorId} className="bg-slate-950 p-2 rounded-lg border border-slate-800 text-xs flex items-center justify-between">
-                      <div>
-                        <span className="font-bold text-slate-200">{split.logoEmoji} {split.vendorName}</span>
-                        <span className="block text-[9px] text-slate-400">{split.items.length} item(s) • {split.deliverySLA}</span>
+              <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-start space-x-3 shadow-sm">
+                <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                  <Gift className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-wide">Bank &amp; UPI Offer Stacking</h3>
+                  <p className="text-xs text-slate-500 mt-1">Automatically stacks HDFC, CRED Pay, and instant UPI discounts onto your basket total.</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        )}
+
+        {/* =================================================================== */}
+        {/* TAB 2: COMPARE VIEW (EXACT MATCH FOR PHOTO 2)                      */}
+        {/* =================================================================== */}
+        {activeTab === 'compare' && (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-sm font-black uppercase tracking-wider text-slate-900">⚡ LIVE PRODUCT COMPARISON MATRIX</h2>
+              <span className="text-xs text-slate-500 font-semibold">Showing 4 Featured SKUs</span>
+            </div>
+
+            {/* 2-COLUMN GRID OF COMPARISON CARDS */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {PHOTO_COMPARISONS.map((card) => (
+                <div key={card.id} className="bg-white border border-slate-200 rounded-2xl p-4 space-y-3 shadow-sm">
+                  {/* Top Product Header */}
+                  <div className="flex items-start space-x-3">
+                    <div className="relative shrink-0">
+                      <img src={card.imageUrl} alt={card.title} className="w-20 h-20 object-cover rounded-xl bg-slate-100 border border-slate-200" />
+                      <span className="absolute bottom-1 right-1 bg-slate-900/80 text-white text-[8px] font-bold px-1 rounded">
+                        {card.unitTag}
+                      </span>
+                    </div>
+
+                    <div className="flex-1 min-w-0 space-y-1">
+                      <div className="flex justify-between items-center text-[10px]">
+                        <span className="font-extrabold text-slate-400 uppercase tracking-wide">{card.brand}</span>
+                        <span className="font-mono text-slate-400">GTIN {card.gtin}</span>
                       </div>
-                      <div className="text-right font-mono font-bold text-slate-200">
-                        ₹{split.vendorTotal}
+                      <h3 className="text-sm font-bold text-slate-900 leading-tight">{card.title}</h3>
+                      <p className="text-[11px] text-slate-500 line-clamp-1">{card.description}</p>
+                      
+                      {/* Green Best Deal Badge */}
+                      <div className="flex items-center space-x-2 text-[10px] pt-0.5">
+                        <span className="bg-emerald-600 text-white font-extrabold px-2 py-0.5 rounded-md shadow-sm">
+                          Best Deal: ₹{card.bestDealPrice} on {card.bestDealPlatform}
+                        </span>
+                        <span className="text-emerald-700 font-bold">
+                          ⭐ Save ₹{card.savingsVsMRP} vs MRP
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 6-PLATFORM COMPARISON TABLE */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 space-y-1 text-xs">
+                    <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider pb-1 border-b border-slate-200">
+                      <span>PLATFORM COMPARISON</span>
+                      <span>PRICE &amp; SLA</span>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2 text-[11px]">
+                      {card.matrix.map((p) => (
+                        <div 
+                          key={p.name}
+                          className={`p-1.5 rounded-lg border ${
+                            p.isWinner 
+                              ? 'bg-emerald-100/80 border-emerald-400 text-emerald-950 font-bold' 
+                              : 'bg-white border-slate-200 text-slate-700'
+                          }`}
+                        >
+                          <div className="flex justify-between items-center">
+                            <span className="font-semibold text-[10px] truncate">{p.name}</span>
+                            <span className="font-mono font-black text-slate-900">₹{p.price}</span>
+                          </div>
+                          <div className="flex justify-between items-center text-[9px] text-slate-400 mt-0.5">
+                            <span>⏱ {p.sla}</span>
+                            <span className="line-through">₹{p.mrp}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    <button
+                      onClick={() => {
+                        addToCart(card.catalogItem as any);
+                        toast.success(`Added ${card.title} to Basket!`);
+                      }}
+                      className="py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs rounded-xl shadow-md flex items-center justify-center gap-1.5 transition"
+                    >
+                      <ShoppingCart className="w-3.5 h-3.5" />
+                      <span>ADD TO BASKET</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        toast.info(`Redirecting directly to ${card.bestDealPlatform}...`);
+                      }}
+                      className="py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 font-extrabold text-xs rounded-xl flex items-center justify-center gap-1 transition"
+                    >
+                      <span>BUY ON {card.bestDealPlatform.toUpperCase()}</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* =================================================================== */}
+        {/* TAB 3: ALERTS VIEW (EXACT MATCH FOR PHOTO 1)                        */}
+        {/* =================================================================== */}
+        {activeTab === 'alerts' && (
+          <div className="space-y-4">
+            
+            {/* Top Banner Card (Photo 1) */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-start space-x-3">
+                <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                  <Bell className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-base font-extrabold text-slate-900">Price Drop Monitors ({alerts.length})</h2>
+                  <p className="text-xs text-slate-500">Background PWA worker pings dark-store APIs to catch sudden flash discounts</p>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => toast.success('⚡ PWA Push Notification Test: Amul Butter dropped to ₹250 on ONDC!')}
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl shadow transition"
+                >
+                  ⚡ Test PWA Push Alert
+                </button>
+
+                <button
+                  onClick={() => setNewMonitorModal(true)}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow transition"
+                >
+                  + New Monitor
+                </button>
+              </div>
+            </div>
+
+            {/* Grid of Alert Cards (Photo 1) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {alerts.map((alert) => (
+                <div key={alert.id} className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between shadow-sm relative">
+                  <div className="flex items-center space-x-3">
+                    <img src={alert.imageUrl} alt={alert.title} className="w-16 h-16 object-cover rounded-xl bg-slate-100 border border-slate-200" />
+                    <div className="space-y-1">
+                      <div className="flex items-center space-x-2">
+                        <span className="bg-emerald-600 text-white text-[9px] font-black px-1.5 py-0.2 rounded">
+                          {alert.platform}
+                        </span>
+                        <span className="text-[10px] text-slate-400">Set {alert.date}</span>
+                      </div>
+                      <h3 className="text-xs font-bold text-slate-900">{alert.title}</h3>
+                      <div className="flex items-center space-x-3 text-xs">
+                        <div>
+                          <span className="text-[10px] text-slate-400 block uppercase">CURRENT BEST</span>
+                          <span className="font-extrabold text-slate-900">₹{alert.currentBest}</span>
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-rose-500 font-bold block uppercase">TARGET ALERT</span>
+                          <span className="font-extrabold text-rose-600">₹{alert.targetAlert}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => removeAlert(alert.id)}
+                    className="p-2 text-slate-400 hover:text-rose-600 transition"
+                    title="Remove Monitor"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+      </main>
+
+      {/* ===================================================================== */}
+      {/* FLOATING SAVINGS METER WIDGET (PRESENT ON ALL 4 PHOTOS AT BOTTOM LEFT)  */}
+      {/* ===================================================================== */}
+      <div className="fixed bottom-4 left-4 z-40">
+        <div className="bg-slate-900 border border-slate-800 text-white rounded-full px-4 py-2 shadow-2xl flex items-center space-x-3 border-emerald-500/30">
+          <div className="relative w-6 h-6 flex items-center justify-center">
+            <span className="w-6 h-6 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin absolute"></span>
+            <Zap className="w-3 h-3 text-emerald-400" />
+          </div>
+          <div>
+            <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">SAVINGS METER ⚡</div>
+            <div className="text-xs font-black text-emerald-400 font-mono">₹1240 / ₹1500</div>
+          </div>
+        </div>
+      </div>
+
+      {/* ===================================================================== */}
+      {/* SMART CART DRAWER / MODAL                                             */}
+      {/* ===================================================================== */}
+      {showSmartCartDrawer && (
+        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex justify-end">
+          <div className="bg-white max-w-md w-full h-full shadow-2xl p-5 overflow-y-auto space-y-4 text-slate-900 flex flex-col justify-between">
+            <div className="space-y-4">
+              <div className="flex justify-between items-center border-b border-slate-200 pb-3">
+                <div className="flex items-center space-x-2">
+                  <ShoppingCart className="w-5 h-5 text-indigo-600" />
+                  <h2 className="text-sm font-black uppercase tracking-wider text-slate-900">Smart Cart Optimizer</h2>
+                </div>
+                <button onClick={() => setShowSmartCartDrawer(false)} className="text-slate-400 hover:text-slate-900 text-sm font-bold">✕</button>
+              </div>
+
+              {/* Strategy Selector */}
+              <div className="grid grid-cols-4 gap-1 bg-slate-100 p-1 rounded-xl text-[10px] font-bold">
+                {[
+                  { id: 'single', label: '🏆 Single' },
+                  { id: 'split2', label: '🔀 2-Split' },
+                  { id: 'split3', label: '⚡ 3-Split' },
+                  { id: 'fastest', label: '⏱ SLA' },
+                ].map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => setSelectedStrategy(s.id as any)}
+                    className={`py-1.5 rounded-lg text-center ${
+                      selectedStrategy === s.id ? 'bg-indigo-600 text-white font-black' : 'text-slate-600'
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Items List */}
+              {cart.length === 0 ? (
+                <p className="text-xs text-slate-500 text-center py-8">Your cart is empty!</p>
+              ) : (
+                <div className="space-y-2 max-h-60 overflow-y-auto">
+                  {cart.map((item) => (
+                    <div key={item.product.id} className="bg-slate-50 p-2.5 rounded-xl border border-slate-200 flex justify-between items-center text-xs">
+                      <div>
+                        <div className="font-bold text-slate-900">{item.product.title}</div>
+                        <div className="text-[10px] text-slate-500">₹{item.product.mrp} MRP</div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <button onClick={() => updateQuantity(item.product.id, item.quantity - 1)} className="w-5 h-5 bg-slate-200 rounded font-bold">-</button>
+                        <span className="font-bold">{item.quantity}</span>
+                        <button onClick={() => updateQuantity(item.product.id, item.quantity + 1)} className="w-5 h-5 bg-slate-200 rounded font-bold">+</button>
                       </div>
                     </div>
                   ))}
                 </div>
+              )}
 
-                {/* Checkout Handoff Options */}
-                <div className="space-y-1.5 pt-1">
-                  <button
-                    onClick={() => handleTriggerCheckout('ondc')}
-                    className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-1.5 transition"
-                  >
-                    <span>🟢 ONDC Beckn Transaction Schema</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
+              {/* Optimization Result */}
+              {optimizationResult && (
+                <div className="space-y-3 pt-2 border-t border-slate-200">
+                  <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex justify-between items-center">
+                    <div>
+                      <span className="text-[10px] font-bold text-emerald-800 uppercase">Net Savings</span>
+                      <div className="text-xl font-black text-emerald-700">₹{optimizationResult.totalNetSavings}</div>
+                    </div>
+                    <div className="text-right text-xs">
+                      <div>Pay Total: <span className="font-bold">₹{optimizationResult.grandTotalCost}</span></div>
+                    </div>
+                  </div>
 
-                  <div className="grid grid-cols-2 gap-1.5">
+                  <SavingsBreakdownChart 
+                    items={optimizationResult.itemSavingsBreakdown.map((i) => ({
+                      title: i.productTitle,
+                      savings: i.itemSavings,
+                      platform: i.winningVendor
+                    }))} 
+                  />
+
+                  {/* Checkout Handoff Options */}
+                  <div className="space-y-2 pt-2">
+                    <button
+                      onClick={() => handleTriggerCheckout('ondc')}
+                      className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow flex items-center justify-center gap-1.5"
+                    >
+                      <span>🟢 ONDC Beckn Protocol JSON Payload</span>
+                    </button>
+
                     <button
                       onClick={() => handleTriggerCheckout('amazon')}
-                      className="py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[11px] font-bold rounded-xl flex items-center justify-center gap-1 transition"
+                      className="w-full py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl shadow flex items-center justify-center gap-1.5"
                     >
-                      <span>🟧 Amazon Multi-ASIN</span>
+                      <span>🟧 Amazon Multi-ASIN Cart Link</span>
                     </button>
 
                     <button
                       onClick={() => handleTriggerCheckout('injector')}
-                      className="py-1.5 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 text-[11px] font-bold rounded-xl flex items-center justify-center gap-1 transition"
+                      className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow flex items-center justify-center gap-1.5"
                     >
-                      <Cpu className="w-3 h-3" />
-                      <span>⚡ Injector Handoff</span>
+                      <Cpu className="w-3.5 h-3.5" />
+                      <span>⚡ cart_injector.js Handoff</span>
                     </button>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* =================================================================== */}
-        {/* RIGHT COLUMN: DARK STORE RADAR & GAMIFIED DASHBOARD (3 COLS)        */}
-        {/* =================================================================== */}
-        <section className={`lg:col-span-3 space-y-3 ${activeTabMobile === 'radar' ? 'block' : 'hidden lg:block'}`}>
-          
-          {/* Dark Store Live Radar */}
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-2.5">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xs font-black uppercase tracking-wider text-slate-200 flex items-center gap-1.5">
-                <Zap className="w-4 h-4 text-indigo-400" /> Dark Store Live Radar
-              </h2>
-              <span className="flex items-center space-x-1 text-[9px] text-emerald-400 font-mono">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
-                <span>12ms Ping</span>
-              </span>
+              )}
             </div>
-
-            <div className="space-y-1.5 text-xs">
-              {Object.values(VENDORS).map((v) => (
-                <div key={v.id} className="bg-slate-950 p-2 rounded-lg border border-slate-800/80 flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-base">{v.logoEmoji}</span>
-                    <div>
-                      <div className="font-bold text-slate-200 text-[11px]">{v.name}</div>
-                      <div className="text-[9px] text-slate-400">{location.area} ({location.pincode})</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className={`font-mono font-black text-xs ${v.brandColor}`}>{v.deliverySLA}</div>
-                    <div className="text-[8px] text-slate-500">Free &gt; ₹{v.freeDeliveryThreshold}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="bg-amber-500/10 border border-amber-500/30 p-2 rounded-lg text-[10px] text-amber-300 flex items-center space-x-1.5">
-              <AlertTriangle className="w-4 h-4 shrink-0 text-amber-400" />
-              <span>Peak Demand Notice: +₹15 surge active in {location.area} due to high store load.</span>
-            </div>
-          </div>
-
-          {/* Gamification & Progress */}
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-3">
-            <h2 className="text-xs font-black uppercase tracking-wider text-slate-200 flex items-center gap-1.5">
-              <Award className="w-4 h-4 text-purple-400" /> Gamification & Achievements
-            </h2>
-
-            <XPProgressBar />
-
-            <div className="pt-1">
-              <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Unlocked Trophies</span>
-              <SavingsBadgeSystem compact={false} />
-            </div>
-
-            {/* Platform Win Ratio SVG Chart */}
-            <div className="pt-2 border-t border-slate-800 space-y-1.5">
-              <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Platform Win Ratio</span>
-              <div className="bg-slate-950 p-2 rounded-lg border border-slate-800 space-y-1">
-                {[
-                  { name: 'ONDC Kirana', pct: 45, color: 'bg-emerald-500' },
-                  { name: 'Blinkit', pct: 25, color: 'bg-yellow-500' },
-                  { name: 'Zepto', pct: 18, color: 'bg-purple-500' },
-                  { name: 'Amazon / FK', pct: 12, color: 'bg-amber-500' },
-                ].map((item) => (
-                  <div key={item.name} className="space-y-0.5 text-[10px]">
-                    <div className="flex justify-between font-semibold text-slate-300">
-                      <span>{item.name}</span>
-                      <span>{item.pct}%</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                      <div className={`h-full ${item.color}`} style={{ width: `${item.pct}%` }}></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-        </section>
-      </main>
-
-      {/* PRICE ALERT MODAL */}
-      {alertModalProduct && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 max-w-sm w-full space-y-4 shadow-2xl">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="font-bold text-sm text-slate-100">Set Price Drop Monitor</h3>
-                <p className="text-xs text-slate-400">{alertModalProduct.title}</p>
-              </div>
-              <button onClick={() => setAlertModalProduct(null)} className="text-slate-400 hover:text-white text-xs font-bold">✕</button>
-            </div>
-
-            <div className="space-y-2 text-xs">
-              <label className="block font-semibold text-slate-300">Target Alert Price (₹):</label>
-              <input
-                type="number"
-                value={targetPrice}
-                onChange={(e) => setTargetPrice(Number(e.target.value))}
-                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 font-bold outline-none focus:border-amber-500"
-              />
-              <p className="text-[10px] text-slate-400">Current Lowest: ₹{getBestVendor(alertModalProduct).winner.price}</p>
-            </div>
-
-            <button
-              onClick={() => {
-                toast.success(`Price drop monitor configured for ₹${targetPrice}! PWA Push Notification active.`);
-                setAlertModalProduct(null);
-              }}
-              className="w-full py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow-lg transition"
-            >
-              Confirm Alert Monitor
-            </button>
           </div>
         </div>
       )}
 
-      {/* ONDC PAYLOAD MODAL */}
+      {/* ONDC MODAL */}
       {ondcPayloadModal && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 max-w-lg w-full space-y-3 shadow-2xl">
+        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-2xl p-5 max-w-lg w-full space-y-3 shadow-2xl">
             <div className="flex justify-between items-center">
-              <h3 className="font-bold text-xs text-emerald-400 uppercase tracking-wider flex items-center gap-1">
-                <span>🟢</span> ONDC Beckn Protocol JSON Payload (/select & /init)
-              </h3>
-              <button onClick={() => setOndcPayloadModal(null)} className="text-slate-400 hover:text-white text-xs font-bold">✕</button>
+              <h3 className="font-bold text-xs text-emerald-700 uppercase tracking-wider">🟢 ONDC Beckn Protocol JSON Payload</h3>
+              <button onClick={() => setOndcPayloadModal(null)} className="text-slate-400 hover:text-slate-900 text-xs font-bold">✕</button>
             </div>
-
-            <pre className="bg-slate-950 p-3 rounded-xl border border-slate-800 text-[10px] font-mono text-emerald-300 max-h-64 overflow-y-auto no-scrollbar">
+            <pre className="bg-slate-900 p-3 rounded-xl text-[10px] font-mono text-emerald-400 max-h-64 overflow-y-auto">
               {ondcPayloadModal}
             </pre>
-
             <div className="flex justify-end space-x-2">
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText(ondcPayloadModal);
-                  toast.success('ONDC Beckn JSON copied!');
-                }}
-                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg text-slate-200"
-              >
-                Copy Payload
-              </button>
-              <button
-                onClick={() => setOndcPayloadModal(null)}
-                className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-xs font-bold rounded-lg text-white"
-              >
-                Done
-              </button>
+              <button onClick={() => { navigator.clipboard.writeText(ondcPayloadModal); toast.success('Copied!'); }} className="px-3 py-1.5 bg-slate-200 text-xs font-bold rounded-lg">Copy</button>
+              <button onClick={() => setOndcPayloadModal(null)} className="px-3 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded-lg">Close</button>
             </div>
           </div>
         </div>
@@ -692,70 +952,24 @@ export default function HighDensityMasterApp() {
 
       {/* INJECTOR LOGS MODAL */}
       {injectorLogsModal && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 max-w-lg w-full space-y-3 shadow-2xl">
+        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-2xl p-5 max-w-lg w-full space-y-3 shadow-2xl">
             <div className="flex justify-between items-center">
-              <h3 className="font-bold text-xs text-indigo-400 uppercase tracking-wider flex items-center gap-1">
-                <Cpu className="w-4 h-4" /> cart_injector.js WebView DOM Autofill Logs
-              </h3>
-              <button onClick={() => setInjectorLogsModal(null)} className="text-slate-400 hover:text-white text-xs font-bold">✕</button>
+              <h3 className="font-bold text-xs text-indigo-700 uppercase tracking-wider">⚡ cart_injector.js Logs</h3>
+              <button onClick={() => setInjectorLogsModal(null)} className="text-slate-400 hover:text-slate-900 text-xs font-bold">✕</button>
             </div>
-
-            <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 text-[10px] font-mono text-indigo-300 space-y-1 max-h-64 overflow-y-auto no-scrollbar">
+            <div className="bg-slate-900 p-3 rounded-xl text-[10px] font-mono text-indigo-300 space-y-1 max-h-64 overflow-y-auto">
               {injectorLogsModal.map((log, i) => (
-                <div key={i} className="flex items-start space-x-1.5">
-                  <span className="text-slate-600">&gt;</span>
-                  <span>{log}</span>
-                </div>
+                <div key={i}>&gt; {log}</div>
               ))}
             </div>
-
             <div className="flex justify-end">
-              <button
-                onClick={() => setInjectorLogsModal(null)}
-                className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-xs font-bold rounded-lg text-white"
-              >
-                Close Logs
-              </button>
+              <button onClick={() => setInjectorLogsModal(null)} className="px-3 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-lg">Close</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* STICKY MOBILE NAVIGATION */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800 flex justify-around items-center h-14 text-[10px] font-bold">
-        <button
-          onClick={() => setActiveTabMobile('compare')}
-          className={`flex flex-col items-center space-y-1 ${activeTabMobile === 'compare' ? 'text-indigo-400' : 'text-slate-400'}`}
-        >
-          <Layers className="w-4 h-4" />
-          <span>Compare</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTabMobile('cart')}
-          className={`flex flex-col items-center space-y-1 relative ${activeTabMobile === 'cart' ? 'text-indigo-400' : 'text-slate-400'}`}
-        >
-          <ShoppingCart className="w-4 h-4" />
-          <span>Cart ({cart.length})</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTabMobile('radar')}
-          className={`flex flex-col items-center space-y-1 ${activeTabMobile === 'radar' ? 'text-indigo-400' : 'text-slate-400'}`}
-        >
-          <Zap className="w-4 h-4" />
-          <span>Radar</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTabMobile('profile')}
-          className={`flex flex-col items-center space-y-1 ${activeTabMobile === 'profile' ? 'text-indigo-400' : 'text-slate-400'}`}
-        >
-          <Award className="w-4 h-4" />
-          <span>Rewards</span>
-        </button>
-      </nav>
     </div>
   );
 }
